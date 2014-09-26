@@ -1,84 +1,237 @@
 package bdi.glue.http.httpclient;
 
-import bdi.glue.http.common.HttpException;
-import bdi.glue.http.common.HttpGateway;
-import bdi.glue.http.common.HttpMethod;
-import bdi.glue.http.common.HttpRequestBuilder;
-import bdi.glue.http.common.HttpResponse;
+import bdi.glue.http.common.*;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.AuthCache;
 import org.apache.http.client.CookieStore;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.*;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.impl.auth.BasicScheme;
+import org.apache.http.impl.client.BasicAuthCache;
+import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.util.EntityUtils;
+import org.apache.http.impl.cookie.BasicClientCookie;
+import org.apache.http.message.BasicHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.UnknownFormatConversionException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.util.List;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
 public class HttpClientGateway implements HttpGateway {
 
+    private static final Charset UTF8 = Charset.forName("utf8");
+
     private Logger log = LoggerFactory.getLogger(HttpClientGateway.class);
 
-    private final CloseableHttpClient closeableHttpClient;
-    private final CookieStore cookieStore;
+    private final HttpClientWorld httpClientWorld;
+    private URI hostUri;
 
-    public HttpClientGateway(CloseableHttpClient closeableHttpClient, CookieStore cookieStore) {
-        this.closeableHttpClient = closeableHttpClient;
-        this.cookieStore = cookieStore;
+    public HttpClientGateway(HttpClientWorld httpClientWorld) {
+        this.httpClientWorld = httpClientWorld;
+    }
+
+    @Override
+    public void defineHost(URI hostUri) {
+        this.hostUri = hostUri;
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T> T getAdapter(Class<T> type) {
-        if (type.isAssignableFrom(CloseableHttpResponse.class))
-            return (T) closeableHttpClient;
-        throw new UnknownFormatConversionException("For type: " + type);
+        if (type.equals(CloseableHttpClient.class)) {
+            return (T) httpClientWorld.httpClient();
+        }
+        if (type.isAssignableFrom(CookieStore.class)) {
+            return (T) httpClientWorld.cookieStore();
+        }
+        if (type.isAssignableFrom(HttpClientContext.class)) {
+            return (T) httpClientWorld.httpClientContext();
+        }
+
+        return null;
     }
 
     @Override
     public HttpResponse invoke(HttpRequestBuilder req) {
         HttpMethod m = HttpMethod.lookup(req.getMethodAsString());
+        String requestPath = req.getRequestPath();
 
-        HttpRequestBase requestBase;
-        switch (m) {
-            case GET:
-                requestBase = new HttpGet(req.generateUrl());
-                break;
-            case PUT:
-                requestBase = new HttpPut(req.generateUrl());
-                break;
-            case POST:
-                requestBase = new HttpPost(req.generateUrl());
-                break;
-            case DELETE:
-                requestBase = new HttpDelete(req.generateUrl());
-                break;
-            case HEAD:
-                requestBase = new HttpHead(req.generateUrl());
-                break;
-            case OPTIONS:
-                requestBase = new HttpOptions(req.generateUrl());
-                break;
-            case TRACE:
-                requestBase = new HttpTrace(req.generateUrl());
-                break;
-            case PATCH:
-                requestBase = new HttpPatch(req.generateUrl());
-                break;
-            default:
-                throw new IllegalArgumentException("Unsupported method " + m + "'");
+        log.info("Building request to invoke {} on {}", m, requestPath);
+
+        HttpHost httpHost = getHttpHost();
+        URIBuilder uriBuilder = getUriBuilder(req, httpHost);
+
+        configureParameters(req, uriBuilder);
+        URI uri;
+        try {
+            uri = uriBuilder.build();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Fail to build URI " + uriBuilder);
         }
 
+        HttpRequestBase requestBase = createHttpRequestBase(m);
+        configureBody(req, m, requestBase);
+        requestBase.setURI(uri);
+
+        HttpClientContext context = httpClientWorld.httpClientContext();
+        configureBasicAuth(req, httpHost, context);
+        configureHeaders(req, requestBase);
+
+        configureCookies(req);
+
         try {
-            CloseableHttpResponse lastResponse = closeableHttpClient.execute(requestBase);
+            CloseableHttpClient closeableHttpClient = httpClientWorld.httpClient();
+
+            CloseableHttpResponse lastResponse =
+                    (httpHost != null) ?
+                            closeableHttpClient.execute(
+                                    httpHost,
+                                    requestBase,
+                                    context) :
+                            closeableHttpClient.execute(
+                                    requestBase,
+                                    context);
+
             log.debug("{}", lastResponse.getStatusLine());
-            return new HttpResponseAdapter(lastResponse, cookieStore);
+            return new HttpResponseAdapter(lastResponse, httpClientWorld.cookieStore());
         } catch (IOException e) {
             throw new HttpException(e);
         }
+    }
+
+    private void configureCookies(HttpRequestBuilder req) {
+        BasicCookieStore cookieStore = httpClientWorld.cookieStore();
+
+        // no remove cookie method
+        List<org.apache.http.cookie.Cookie> cookies = cookieStore.getCookies();
+        cookieStore.clear();
+        List<String> cookiesToRemove = req.getCookiesToRemove();
+        for (org.apache.http.cookie.Cookie cookie : cookies) {
+            if (!cookiesToRemove.contains(cookie.getName()))
+                cookieStore.addCookie(cookie);
+        }
+
+        for (Cookie cookie : req.getCookies()) {
+            cookieStore.addCookie(new BasicClientCookie(cookie.name(), cookie.value()));
+        }
+    }
+
+    private void configureBody(HttpRequestBuilder req, HttpMethod m, HttpRequestBase requestBase) {
+        String body = req.getBody();
+        if (body == null)
+            return;
+
+        if (!(requestBase instanceof HttpEntityEnclosingRequestBase)) {
+            throw new IllegalArgumentException("Cannot attach body on " + m + " request");
+        }
+
+        HttpEntity entity = new ByteArrayEntity(body.getBytes(UTF8));
+        ((HttpEntityEnclosingRequestBase) requestBase).setEntity(entity);
+    }
+
+    private URIBuilder getUriBuilder(HttpRequestBuilder req, HttpHost httpHost) {
+        URIBuilder uriBuilder = new URIBuilder();
+        if (httpHost != null) {
+            uriBuilder = uriBuilder
+                    .setScheme(httpHost.getSchemeName())
+                    .setHost(httpHost.toHostString())
+                    .setPort(httpHost.getPort());
+        }
+        return uriBuilder.setPath(req.getRequestPath());
+    }
+
+    private void configureParameters(HttpRequestBuilder req, URIBuilder uriBuilder) {
+        for (Parameter parameter : req.getParameters()) {
+            uriBuilder = uriBuilder.setParameter(parameter.parameterName, parameter.parameterValue);
+        }
+    }
+
+    private HttpRequestBase createHttpRequestBase(HttpMethod m) {
+        switch (m) {
+            case GET:
+                return new HttpGet();
+            case PUT:
+                return new HttpPut();
+            case POST:
+                return new HttpPost();
+            case DELETE:
+                return new HttpDelete();
+            case HEAD:
+                return new HttpHead();
+            case OPTIONS:
+                return new HttpOptions();
+            case TRACE:
+                return new HttpTrace();
+            case PATCH:
+                return new HttpPatch();
+            default:
+                throw new IllegalArgumentException("Unsupported method " + m + "'");
+        }
+    }
+
+    private void configureHeaders(HttpRequestBuilder req,
+                                  HttpRequestBase requestBase) {
+
+        if (req.getContentType() != null) {
+            requestBase.setHeader(HttpHeaders.CONTENT_TYPE, req.getContentType());
+        }
+        requestBase.setHeaders(convert(req.getHeaders()));
+    }
+
+    private void configureBasicAuth(HttpRequestBuilder req,
+                                    HttpHost targetHost,
+                                    HttpClientContext context) {
+        if (req.getUsername() == null && req.getPassword() == null) {
+            return;
+        }
+
+        CredentialsProvider credsProvider = new BasicCredentialsProvider();
+        credsProvider.setCredentials(
+                new AuthScope(targetHost.getHostName(), targetHost.getPort()),
+                new UsernamePasswordCredentials(req.getUsername(), req.getPassword()));
+
+        // Create AuthCache instance
+        AuthCache authCache = new BasicAuthCache();
+
+        // Generate BASIC scheme object and add it to the local auth cache
+        BasicScheme basicAuth = new BasicScheme();
+        authCache.put(targetHost, basicAuth);
+
+        // Add AuthCache to the execution context
+        context.setCredentialsProvider(credsProvider);
+        context.setAuthCache(authCache);
+    }
+
+    private HttpHost getHttpHost() {
+        HttpHost httpHost = null;
+        if (hostUri != null) {
+            httpHost = new HttpHost(hostUri.getHost(), hostUri.getPort(), hostUri.getScheme());
+        }
+        return httpHost;
+    }
+
+    private static org.apache.http.Header[] convert(List<bdi.glue.http.common.Header> headers) {
+        org.apache.http.Header[] array = new org.apache.http.Header[headers.size()];
+        for (int i = 0; i < headers.size(); i++) {
+            bdi.glue.http.common.Header h = headers.get(i);
+            array[i] = new BasicHeader(h.name, h.value);
+        }
+        return array;
     }
 
 }

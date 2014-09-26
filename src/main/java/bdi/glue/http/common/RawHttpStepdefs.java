@@ -5,10 +5,10 @@ import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import org.assertj.core.api.StringAssert;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.skyscreamer.jsonassert.JSONCompare;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,6 +32,14 @@ public class RawHttpStepdefs {
     //  | |__| |_| |_   \  /  | |____| |\  |
     //   \_____|_____|   \/   |______|_| \_|
     //-------------------------------------------------------------------------
+
+    @Given("^an host set to \"([^\"]*)\"$")
+    public void defineHost(String uriAsString) throws Throwable {
+        URI uri = new URI(uriAsString);
+        httpWorld
+                .getHttpGateway()
+                .defineHost(uri);
+    }
 
     @Given("^the request's header \"([^\"]*)\" has been set to \"([^\"]*)\"$")
     public void defineRequestHeader(String headerName, String headerValue) {
@@ -61,7 +69,9 @@ public class RawHttpStepdefs {
 
     @Given("^the request has no cookie named (.*)$")
     public void removeCookieFromHttpRequest(String cookieName) {
-        // nothing to do
+        httpWorld
+                .currentRequestBuilder()
+                .cookieToRemove(cookieName);
     }
 
     @Given("^the request cookie \"([^\"]*)\" has been set to \"([^\"]*)\"$")
@@ -69,6 +79,32 @@ public class RawHttpStepdefs {
         httpWorld
                 .currentRequestBuilder()
                 .cookie(cookieName, cookieValue);
+    }
+
+    @Given("^basic auth credentials set to \"([^\"]*)\" and \"([^\"]*)\"$")
+    public void defineBasicAuthCredentials(String username, String password) throws Throwable {
+        httpWorld
+                .currentRequestBuilder()
+                .basicAuthCredentials(username, password);
+    }
+
+    /**
+     * Defined in the HTTP/1.1 Standard, section 14.1, the Accept: header lists the MIME Types of the
+     * media that the agent is willing to process. It is comma-separated lists of MIME type, each
+     * combined with a quality factor, as parameters giving the relative degree of preference between
+     * the different MIME Types lists.
+     * <p/>
+     * <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Content_negotiation">Content negotiation - MDN</a>
+     * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec12.html">rfc2616 section 12</a>
+     *
+     * @param contentTypes comma-separated lists of MIME type (e.g. "application/json" or "text/html" ...)
+     * @throws Throwable
+     */
+    @Given("^a content format negotiation set to \"([^\"]*)\"$")
+    public void defineAcceptHeader(String contentTypes) throws Throwable {
+        httpWorld
+                .currentRequestBuilder()
+                .header(new Header("Accept", contentTypes));
     }
 
     //-------------------------------------------------------------------------
@@ -89,16 +125,27 @@ public class RawHttpStepdefs {
         HttpRequestBuilder req = httpWorld
                 .currentRequestBuilder()
                 .method(methodAsString)
-                .url(url);
+                .requestPath(url);
         invoke(req);
     }
+
+    @When("^a ([a-zA-Z]+) request is made to \"([^\"]+)\" with the following parameters:$")
+    public void invokeUsingMethod(String methodAsString, String url, List<Parameter> parameters) {
+        HttpRequestBuilder req = httpWorld
+                .currentRequestBuilder()
+                .method(methodAsString)
+                .requestPath(url)
+                .parameters(parameters);
+        invoke(req);
+    }
+
 
     @When("^a ([a-zA-Z]+) request is made to \"([^\"]+)\" with content type \"([^\"]+)\" with:$")
     public void invokeUsingMethod(String methodAsString, String url, String contentType, String body) {
         HttpRequestBuilder req = httpWorld
                 .currentRequestBuilder()
                 .method(methodAsString)
-                .url(url)
+                .requestPath(url)
                 .contentType(contentType)
                 .body(body);
         invoke(req);
@@ -134,6 +181,15 @@ public class RawHttpStepdefs {
         assertThat(response.statusCode()).isEqualTo(expectedCode);
     }
 
+    @Then("^the response status code should be (\\d+) \\((.+)\\)$")
+    public void assertResponseCodeIs(int expectedCode, String explanation) {
+        HttpResponse response = httpWorld.lastResponse();
+        assertThat(response.statusCode()).isEqualTo(expectedCode);
+
+        HttpStatus httpStatus = HttpStatus.valueOf(response.statusCode());
+        assertThat(httpStatus.name().replace("_", " ")).isEqualToIgnoringCase(explanation);
+    }
+
     @Then("^the response should have the cookie (.*)$")
     public void assertResponseCookieIsPresent(String cookieName) {
         HttpResponse response = httpWorld.lastResponse();
@@ -152,7 +208,7 @@ public class RawHttpStepdefs {
                 .isTrue();
     }
 
-    @Then("^the response's body should (match|contain|be) \"([^\"]*)\"$")
+    @Then("^the response's body should (start with|end with|match|contain|be) \"(.*)\"$")
     public void assertResponseBodySatisfies(String comparator, String expectedText) {
         HttpResponse response = httpWorld.lastResponse();
         StringAssert stringAssert = assertThat(response.bodyAsText());
@@ -165,6 +221,12 @@ public class RawHttpStepdefs {
                 break;
             case "be":
                 stringAssert.isEqualTo(expectedText);
+                break;
+            case "start with":
+                stringAssert.startsWith(expectedText);
+                break;
+            case "end with":
+                stringAssert.endsWith(expectedText);
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported comparator '" + comparator + "'");
@@ -201,7 +263,7 @@ public class RawHttpStepdefs {
         String actual = response.bodyAsText();
 
         JSONCompareMode mode = JSONCompareMode.LENIENT;
-        if(comparator.equals("be"))
+        if (comparator.equals("be"))
             mode = JSONCompareMode.NON_EXTENSIBLE;
 
         JSONCompare.compareJSON(expectedText, actual, mode);
@@ -226,4 +288,5 @@ public class RawHttpStepdefs {
     public void assertResponseHasNotBeenRedirected() {
         throw new UnsupportedOperationException();
     }
+
 }

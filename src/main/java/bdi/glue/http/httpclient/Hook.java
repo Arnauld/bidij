@@ -20,9 +20,7 @@ public class Hook {
 
     @Before(order = 1000)
     public void initHttpGateway() {
-        HttpClientGateway httpGateway = new HttpClientGateway(
-                httpClientWorld.httpClient(),
-                httpClientWorld.cookieStore());
+        HttpClientGateway httpGateway = new HttpClientGateway(httpClientWorld);
         bdiWorld.defineHttpGateway(httpGateway);
     }
 

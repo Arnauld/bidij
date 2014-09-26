@@ -8,6 +8,12 @@
 
     <logger name="bdi.glue.http.httpclient" level="debug"/>
 
+    <logger name="org.eclipse.jetty" level="info"/>
+    <logger name="org.eclipse.jetty.io" level="warn"/>
+    <logger name="org.eclipse.jetty.util" level="warn"/>
+    <logger name="org.eclipse.jetty.server" level="warn"/>
+    <logger name="org.eclipse.jetty.http" level="warn"/>
+    d
     <root level="info">
         <appender-ref ref="STDOUT"/>
     </root>

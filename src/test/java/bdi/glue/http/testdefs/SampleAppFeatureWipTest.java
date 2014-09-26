@@ -9,6 +9,7 @@ import org.junit.runner.RunWith;
  */
 @RunWith(Cucumber.class)
 @CucumberOptions(
+        tags = {"@wip"},
         glue = {"bdi.glue.http.testdefs", "bdi.glue.http.common", "bdi.glue.http.httpclient"})
-public class SampleAppFeatureTest {
+public class SampleAppFeatureWipTest {
 }
