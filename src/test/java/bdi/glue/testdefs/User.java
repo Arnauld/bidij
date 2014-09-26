@@ -1,4 +1,4 @@
-package bdi.glue.http.testdefs.app;
+package bdi.glue.testdefs;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>

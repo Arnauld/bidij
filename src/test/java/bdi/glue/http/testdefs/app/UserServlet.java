@@ -1,5 +1,7 @@
 package bdi.glue.http.testdefs.app;
 
+import bdi.glue.testdefs.User;
+import bdi.glue.testdefs.UserRepository;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.commons.io.IOUtils;

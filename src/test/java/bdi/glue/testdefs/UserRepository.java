@@ -1,4 +1,4 @@
-package bdi.glue.http.testdefs.app;
+package bdi.glue.testdefs;
 
 import java.util.ArrayList;
 import java.util.Arrays;

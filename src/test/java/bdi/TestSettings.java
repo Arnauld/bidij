@@ -22,7 +22,7 @@ public class TestSettings {
         return properties().getProperty(key);
     }
 
-    private Properties properties() {
+    public Properties properties() {
         if (properties == null) {
             properties = new Properties();
             try (InputStream in = TestSettings.class.getResourceAsStream("/test-settings.properties")) {

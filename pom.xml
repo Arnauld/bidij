@@ -139,6 +139,18 @@
         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
         <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.181</version>
+            <scope>test</scope>
+        </dependency>
+
+
+        <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+        <!-- SSH -->
+        <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+        <dependency>
             <groupId>com.jcraft</groupId>
             <artifactId>jsch</artifactId>
             <version>0.1.51</version>
