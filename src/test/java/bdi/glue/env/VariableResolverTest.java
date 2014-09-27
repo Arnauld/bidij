@@ -1,10 +1,10 @@
 package bdi.glue.env;
 
 
-import bdi.glue.util.New;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,7 +16,14 @@ public class VariableResolverTest {
     @Before
     public void setUp() {
         templateEngine = new VariableResolver();
-        variables = New.hashMap("who", "World", "when", "tomorrow");
+        variables = newHashMap("who", "World", "when", "tomorrow");
+    }
+
+    private <K, V> Map<K, V> newHashMap(K k1, V v1, K k2, V v2) {
+        HashMap<K, V> map = new HashMap<>();
+        map.put(k1, v1);
+        map.put(k2, v2);
+        return map;
     }
 
     @Test
