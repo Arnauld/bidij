@@ -1,4 +1,4 @@
-package bdi.glue.http.testdefs;
+package bdi.glue.jdbc.testdefs;
 
 import cucumber.api.CucumberOptions;
 import cucumber.api.junit.Cucumber;
@@ -9,7 +9,7 @@ import org.junit.runner.RunWith;
  */
 @RunWith(Cucumber.class)
 @CucumberOptions(
-        tags = {"@wip"},
-        glue = {"bdi.glue.http.testdefs", "bdi.glue.http.common", "bdi.glue.http.httpclient"})
-public class SampleAppFeatureWipTest {
+        glue = {"bdi.glue.jdbc.testdefs", "bdi.glue.jdbc.common"},
+        format = "tzatziki.analysis.exec.gson.JsonEmitterReport:target/jdbc")
+public class JdbcFeatures {
 }

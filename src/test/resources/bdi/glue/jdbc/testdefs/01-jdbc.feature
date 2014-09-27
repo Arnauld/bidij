@@ -1,8 +1,5 @@
+@jdbc
 Feature: Check the JDBC steps
-
-  In order to ease the testing of database
-  As an automation tester
-  I want some predefined steps to write and to check database.
 
   Scenario: Simple Access
 

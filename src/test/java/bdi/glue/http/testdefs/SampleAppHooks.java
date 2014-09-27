@@ -23,13 +23,13 @@ public class SampleAppHooks {
         this.httpClientWorld = httpClientWorld;
     }
 
-    @Before(value = "@secure", order = 10000)
+    @Before(value = "@http_secure", order = 10000)
     public void configureAuthentication() {
         httpClientWorld.registerClientConfigurer(client -> client);
         httpClientWorld.registerBuilderConfigurer(builder -> configureSSL(builder));
     }
 
-    @Before(value = "@secure__allow_all_hostname", order = 100)
+    @Before(value = "@http_secure__allow_all_hostname", order = 100)
     public void configureAllowAllHostname() {
         allowAllHostname = true;
     }

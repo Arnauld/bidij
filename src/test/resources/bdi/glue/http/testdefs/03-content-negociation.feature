@@ -1,8 +1,5 @@
+@http
 Feature: Headers and Content Negociation
-
-  In order to ease the testing of a HTTP server
-  As an automation tester
-  I want some predefined steps to write and to check HTTP request and HTTP response.
 
   Scenario: GET with json content negotiation
 

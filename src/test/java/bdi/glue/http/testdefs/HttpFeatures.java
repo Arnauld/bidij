@@ -9,6 +9,7 @@ import org.junit.runner.RunWith;
  */
 @RunWith(Cucumber.class)
 @CucumberOptions(
-        glue = {"bdi.glue.http.testdefs", "bdi.glue.http.common", "bdi.glue.http.httpclient"})
-public class SampleAppFeatureTest {
+        glue = {"bdi.glue.http.testdefs", "bdi.glue.http.common", "bdi.glue.http.httpclient"},
+        format = "tzatziki.analysis.exec.gson.JsonEmitterReport:target/http")
+public class HttpFeatures {
 }

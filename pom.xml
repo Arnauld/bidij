@@ -47,6 +47,7 @@
         <junit.version>4.11</junit.version>
         <jetty.version>9.2.2.v20140723</jetty.version>
         <slf4j.version>1.7.7</slf4j.version>
+        <tzatziki.version>0.10.3-SNAPSHOT</tzatziki.version>
     </properties>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -92,6 +93,17 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.4</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+        <!-- tzatziki -->
+        <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+        <dependency>
+            <groupId>org.technbolts.tzatziki</groupId>
+            <artifactId>tzatziki-pdf</artifactId>
+            <version>${tzatziki.version}</version>
             <scope>test</scope>
         </dependency>
 

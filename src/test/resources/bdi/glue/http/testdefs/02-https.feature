@@ -1,8 +1,5 @@
+@http
 Feature: HTTPS steps
-
-  In order to ease the testing of a secured HTTP server
-  As an automation tester
-  I want some predefined steps to write and to check HTTPs request and HTTP response.
 
   Scenario: GET on app with https configuration set
 
@@ -11,8 +8,8 @@ Feature: HTTPS steps
     When a GET request is made to "/users"
     Then the response status code should be 200
 
-  @secure
-  @secure__allow_all_hostname
+  @http_secure
+  @http_secure__allow_all_hostname
   Scenario: GET on https
 
     Given a sample server running on port 8080 and on secure port 8083
@@ -20,8 +17,8 @@ Feature: HTTPS steps
     When a GET request is made to "/users"
     Then the response status code should be 200
 
-  @secure
-  @secure__allow_all_hostname
+  @http_secure
+  @http_secure__allow_all_hostname
   Scenario: GET on https with basic auth no credential provided
 
     Given a sample server running on port 8080 and on secure port 8083
@@ -29,8 +26,8 @@ Feature: HTTPS steps
     When a GET request is made to "/auth/users"
     Then the response status code should be 401 (Unauthorized)
 
-  @secure
-  @secure__allow_all_hostname
+  @http_secure
+  @http_secure__allow_all_hostname
   Scenario: GET on https with basic auth using default credentials
 
     Given a sample server running on port 8080 and on secure port 8083
@@ -39,8 +36,8 @@ Feature: HTTPS steps
     When a GET request is made to "/auth/users"
     Then the response status code should be 200 (OK)
 
-  @secure
-  @secure__allow_all_hostname
+  @http_secure
+  @http_secure__allow_all_hostname
   Scenario: GET on https with basic auth specifying credentials
 
     Given a sample server running on port 8080 and on secure port 8083
@@ -49,8 +46,8 @@ Feature: HTTPS steps
     When a GET request is made to "/auth/users"
     Then the response status code should be 200 (OK)
 
-  @secure
-  @secure__allow_all_hostname
+  @http_secure
+  @http_secure__allow_all_hostname
   Scenario: GET on https with basic auth specifying credentials
 
     Given a sample server running on port 8080 and on secure port 8083
