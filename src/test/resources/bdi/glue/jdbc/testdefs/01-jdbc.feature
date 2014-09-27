@@ -15,9 +15,9 @@ Feature: Check the JDBC steps
   Scenario: Jdbc Configuration
 
     Given the following jdbc configurations:
-      | configuration name | driver        | url                                 | username | password |
-      | server_mode        | org.h2.Driver | jdbc:h2:tcp://localhost/~/test      | pif      | pifp     |
-      | in_memory          | org.h2.Driver | jdbc:h2:mem:test                    | sa       | sa       |
+      | configuration name | driver        | url                               | username | password |
+      | server_mode        | org.h2.Driver | jdbc:h2:tcp://localhost/~/test    | pif      | pifp     |
+      | in_memory          | org.h2.Driver | jdbc:h2:mem:test                  | sa       | sa       |
       | file               | org.h2.Driver | jdbc:h2:${workingDir}/db_${idgen} | sa       | sa       |
     And a sample database running using configuration "file"
 
