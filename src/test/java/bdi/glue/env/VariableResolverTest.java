@@ -21,19 +21,19 @@ public class VariableResolverTest {
 
     @Test
     public void resolve_basic() {
-        String resolved = templateEngine.resolve("${who}${when}", variables);
+        String resolved = templateEngine.resolve("${who}${when}", VariableResolver.convert(variables));
         assertThat(resolved).isEqualTo("Worldtomorrow");
     }
 
     @Test
     public void resolve() {
-        String resolved = templateEngine.resolve("Hello ${who}!!", variables);
+        String resolved = templateEngine.resolve("Hello ${who}!!", VariableResolver.convert(variables));
         assertThat(resolved).isEqualTo("Hello World!!");
     }
 
     @Test
     public void resolve_unknownVariableIsLeftAsIs() {
-        String resolved = templateEngine.resolve("Hello ${whom} ${when}!!", variables);
+        String resolved = templateEngine.resolve("Hello ${whom} ${when}!!", VariableResolver.convert(variables));
         assertThat(resolved).isEqualTo("Hello ${whom} tomorrow!!");
     }
 }

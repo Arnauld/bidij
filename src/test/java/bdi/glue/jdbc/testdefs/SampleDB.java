@@ -21,10 +21,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SampleDB {
 
     private static AtomicInteger idGen = new AtomicInteger();
+    public static String generateId() {
+        return new SimpleDateFormat("yyyyMMdd'_'HHmmss").format(new Date()) + "_" + idGen.incrementAndGet();
+    }
 
     private Logger log = LoggerFactory.getLogger(SampleDB.class);
 
-    private final String id = new SimpleDateFormat("yyyyMMdd'_'HHmmss").format(new Date()) + "_" + idGen.incrementAndGet();
     private final String url;
     private final String username;
     private final String password;
@@ -44,7 +46,7 @@ public class SampleDB {
     private SampleDB(String workingDir, String url, String username, String password) {
         this.username = username;
         this.password = password;
-        this.url = (url != null) ? (url) : ("jdbc:h2:" + workingDir + "/db" + id);
+        this.url = (url != null) ? (url) : ("jdbc:h2:" + workingDir + "/db_" + generateId());
     }
 
     public String driver() {
@@ -64,7 +66,7 @@ public class SampleDB {
     }
 
     public void init() {
-        log.info("Initializing db");
+        log.info("Initializing db: {}", url());
         initDriver();
         try (Connection conn = DriverManager.getConnection(url(), username(), password())) {
             Statement statement = conn.createStatement();
@@ -95,7 +97,7 @@ public class SampleDB {
     }
 
     public User get(int id) {
-        try (Connection conn = DriverManager.getConnection(url())) {
+        try (Connection conn = DriverManager.getConnection(url(), username(), password())) {
             PreparedStatement pStmt = conn.prepareStatement("SELECT id, firstname, lastname FROM user where id = ?");
             pStmt.setInt(1, id);
             ResultSet resultSet = pStmt.executeQuery();

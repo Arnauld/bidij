@@ -3,6 +3,7 @@ package bdi.glue.env;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,16 +11,23 @@ import java.util.regex.Pattern;
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
 public class VariableResolver {
-    private Map<String, String> variables = new HashMap<>();
+    private Map<String, Supplier<String>> variables = new HashMap<>();
     private Pattern variablePattern = Pattern.compile("\\$\\{([^}]+)\\}");
 
+    public VariableResolver declareVariable(String name, Supplier<String> valueSupplier) {
+        variables.put(name, valueSupplier);
+        return this;
+    }
+
     public VariableResolver declareVariable(String name, String value) {
-        variables.put(name, value);
+        variables.put(name, () -> value);
         return this;
     }
 
     public VariableResolver declareVariables(Map<String, String> variables) {
-        this.variables.putAll(variables);
+        for (Map.Entry<String, String> entry : variables.entrySet()) {
+            declareVariable(entry.getKey(), entry.getValue());
+        }
         return this;
     }
 
@@ -39,7 +47,15 @@ public class VariableResolver {
         return resolve(value, variables);
     }
 
-    public String resolve(String text, Map<String, String> variables) {
+    public static Map<String, Supplier<String>> convert(Map<String, String> variables) {
+        Map<String, Supplier<String>> map = new HashMap<>();
+        for (Map.Entry<String, String> entry : variables.entrySet()) {
+            map.put(entry.getKey(), () -> entry.getValue());
+        }
+        return map;
+    }
+
+    public String resolve(String text, Map<String, Supplier<String>> variables) {
         StringBuilder resolved = new StringBuilder();
 
         Matcher matcher = variablePattern.matcher(text);
@@ -65,9 +81,10 @@ public class VariableResolver {
         return resolved.toString();
     }
 
-    private String lookup(Map<String, String> variables, String key) {
-        String s = variables.get(key);
-        //System.out.println("VariableResolver.lookup:: " + key + " -> <" + s + ">");
-        return s;
+    private String lookup(Map<String, Supplier<String>> variables, String key) {
+        Supplier<String> supplier = variables.get(key);
+        if (supplier == null)
+            return null;
+        return supplier.get();
     }
 }

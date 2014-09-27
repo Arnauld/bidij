@@ -1,21 +1,8 @@
-Feature: Check the HTTP steps
+Feature: HTTPS steps
 
-  In order to ease the testing of HTTP server
+  In order to ease the testing of a secured HTTP server
   As an automation tester
-  I want some predefined steps to write and to check HTTP request and HTTP response.
-
-  Scenario: Simple GET using host
-
-    Given a sample server running on port 8080
-    Given an host set to "http://localhost:8080"
-    When a GET request is made to "/users"
-    Then the response status code should be 200
-
-  Scenario: Simple GET using complete uri
-
-    Given a sample server running on port 8080
-    When a GET request is made to "http://localhost:8080/users"
-    Then the response status code should be 200
+  I want some predefined steps to write and to check HTTPs request and HTTP response.
 
   Scenario: GET on app with https configuration set
 
@@ -75,43 +62,3 @@ Feature: Check the HTTP steps
       | limit          | 10                     |
       | filter         | { :name "/john (.*)/"} |
     Then the response status code should be 200 (OK)
-
-  Scenario: GET with json content negotiation
-
-    Given a sample server running on port 8080
-    Given an host set to "http://localhost:8080"
-    And a content format negotiation set to "application/json"
-    When a GET request is made to "/about"
-    Then the response status code should be 200 (OK)
-    And the json response's body should contain:
-    """
-       { "version" : "1.2.0" }
-    """
-
-  Scenario: GET with html content negocation
-
-    Given a sample server running on port 8080
-    Given an host set to "http://localhost:8080"
-    And a content format negotiation set to "text/html"
-    When a GET request is made to "/about"
-    Then the response status code should be 200 (OK)
-    And the response's body should start with "<html"
-
-  Scenario: A POST with json response
-
-    Given a sample server running on port 8080
-    And an host set to "http://localhost:8080"
-    When a POST request is made to "/users" with content type "application/json" with:
-    """
-    {
-      "firstname":"Carmen",
-      "lastname":"Mccallum"
-    }
-    """
-    Then the response status code should be 201
-    And the json response's body should contain:
-    """
-    {
-      "status":"ok"
-    }
-    """

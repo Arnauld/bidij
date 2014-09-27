@@ -24,6 +24,7 @@ public class SampleDBStepdefs {
 
     @Before
     public void configureVariables() {
+        variableResolver.declareVariable("idgen", SampleDB::generateId);
         variableResolver.declareVariables(new TestSettings().properties());
     }
 
