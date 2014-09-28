@@ -93,12 +93,11 @@ public class RawHttpStepdefs {
      * media that the agent is willing to process. It is comma-separated lists of MIME type, each
      * combined with a quality factor, as parameters giving the relative degree of preference between
      * the different MIME Types lists.
-     * <p/>
-     * <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Content_negotiation">Content negotiation - MDN</a>
-     * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec12.html">rfc2616 section 12</a>
+     *
+     * * [Content negotiation - MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Content_negotiation)
+     * * [rfc2616 section 12](http://www.w3.org/Protocols/rfc2616/rfc2616-sec12.html)
      *
      * @param contentTypes comma-separated lists of MIME type (e.g. "application/json" or "text/html" ...)
-     * @throws Throwable
      */
     @Given("^a content format negotiation set to \"([^\"]*)\"$")
     public void defineAcceptHeader(String contentTypes) throws Throwable {

@@ -8,6 +8,8 @@ import bdi.TestSettings;
 import bdi.glue.http.testdefs.HttpFeatures;
 import bdi.glue.jdbc.testdefs.JdbcFeatures;
 import com.itextpdf.text.DocumentException;
+import gutenberg.itext.ITextContext;
+import gutenberg.itext.SimpleEmitter;
 import gutenberg.itext.model.Markdown;
 import org.junit.AfterClass;
 import org.junit.runner.RunWith;
@@ -16,6 +18,8 @@ import tzatziki.analysis.exec.gson.JsonIO;
 import tzatziki.analysis.exec.model.FeatureExec;
 import tzatziki.analysis.exec.support.TagView;
 import tzatziki.analysis.exec.tag.TagFilter;
+import tzatziki.analysis.java.Grammar;
+import tzatziki.analysis.java.GrammarParser;
 import tzatziki.analysis.tag.TagDictionaryLoader;
 import tzatziki.pdf.support.Configuration;
 import tzatziki.pdf.support.DefaultPdfReportBuilder;
@@ -39,6 +43,9 @@ public class TestSuite {
         File buildDir = new File(settings.buildDir());
         File fileOut = new File(buildDir, "features.pdf");
 
+        File sourceDir = new File(settings.projectDir(), "src/main/java/bdi/glue");
+        Grammar grammar = new GrammarParser().usingSourceDirectory(sourceDir).process();
+
         List<FeatureExec> httpFeatures = loadFeatures(buildDir, "/http");
         List<FeatureExec> jdbcFeatures = loadFeatures(buildDir, "/jdbc");
         new DefaultPdfReportBuilder()
@@ -51,11 +58,17 @@ public class TestSuite {
                 .title("bidij")
                 .subTitle("Behavior Driven Infrastructure support for Java")
                 .markup(Markdown.fromUTF8Resource("/bdi/glue/00-preambule.md"))
-                .overview(FeatureSummary, TagViews)
+                .emit(grammar(grammar))
+                // --- HTTP
                 .markup(Markdown.fromUTF8Resource("/bdi/glue/http/testdefs/00-http.md"))
+                //.overview(httpFeatures, 1, FeatureSummary)
                 .features(httpFeatures, 1)
+                // --- JDBC
                 .markup(Markdown.fromUTF8Resource("/bdi/glue/jdbc/testdefs/00-jdbc.md"))
+                //.overview(jdbcFeatures, 1, FeatureSummary)
                 .features(jdbcFeatures, 1)
+                // ---
+                .overview(TagViews)
                 .tagDictionary(new TagDictionaryLoader().fromUTF8PropertiesResource("/bdi/glue/tags.properties"))
                 .tagViews(
                         new TagView("Jdbc", TagFilter.from("~@wip", "@jdbc")),
@@ -63,6 +76,15 @@ public class TestSuite {
                 )
                 .sampleSteps()
                 .generate(fileOut);
+    }
+
+    private static SimpleEmitter grammar(Grammar grammar) {
+        return new SimpleEmitter() {
+            @Override
+            public void emit(ITextContext context) {
+                context.emit(grammar);
+            }
+        };
     }
 
     private static List<FeatureExec> loadFeatures(File buildDir, String resourcePath) throws IOException {

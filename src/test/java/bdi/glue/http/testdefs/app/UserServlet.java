@@ -1,5 +1,6 @@
 package bdi.glue.http.testdefs.app;
 
+import bdi.glue.http.common.HttpStatus;
 import bdi.glue.testdefs.User;
 import bdi.glue.testdefs.UserRepository;
 import com.google.gson.Gson;
@@ -38,9 +39,14 @@ public class UserServlet extends HttpServlet {
                 req.getRequestURI());
 
         String body = IOUtils.toString(req.getReader());
-        logger.info("Body {}", body);
+        logger.info("Body '{}'", body);
 
         User user = getGson().fromJson(body, User.class);
+        if(user==null) {
+            resp.setStatus(HttpStatus.BAD_REQUEST.value());
+            return;
+        }
+
         Optional<User> previous = userRepository.get(user.id);
         User userAdded = userRepository.addUser(user);
 

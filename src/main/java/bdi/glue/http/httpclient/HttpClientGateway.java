@@ -177,6 +177,8 @@ public class HttpClientGateway implements HttpGateway {
                 return new HttpOptions();
             case TRACE:
                 return new HttpTrace();
+//            case CONNECT:
+//                return new HttpConnect()
             case PATCH:
                 return new HttpPatch();
             default:
