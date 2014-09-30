@@ -7,6 +7,7 @@ package bdi.glue;
 import bdi.TestSettings;
 import bdi.glue.http.testdefs.HttpFeatures;
 import bdi.glue.jdbc.testdefs.JdbcFeatures;
+import bdi.glue.proc.testdefs.ProcFeatures;
 import com.itextpdf.text.DocumentException;
 import gutenberg.itext.ITextContext;
 import gutenberg.itext.SimpleEmitter;
@@ -34,7 +35,7 @@ import static tzatziki.pdf.support.DefaultPdfReportBuilder.Overview.FeatureSumma
 import static tzatziki.pdf.support.DefaultPdfReportBuilder.Overview.TagViews;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({HttpFeatures.class, JdbcFeatures.class})
+@Suite.SuiteClasses({HttpFeatures.class, JdbcFeatures.class, ProcFeatures.class})
 public class TestSuite {
 
     @AfterClass
@@ -48,6 +49,8 @@ public class TestSuite {
 
         List<FeatureExec> httpFeatures = loadFeatures(buildDir, "/http");
         List<FeatureExec> jdbcFeatures = loadFeatures(buildDir, "/jdbc");
+        List<FeatureExec> procFeatures = loadFeatures(buildDir, "/proc");
+
         new DefaultPdfReportBuilder()
                 .using(new Configuration()
                                 .displayFeatureTags(false)
@@ -67,6 +70,10 @@ public class TestSuite {
                 .markup(Markdown.fromUTF8Resource("/bdi/glue/jdbc/testdefs/00-jdbc.md"))
                 //.overview(jdbcFeatures, 1, FeatureSummary)
                 .features(jdbcFeatures, 1)
+                // --- Proc
+                .markup(Markdown.fromUTF8Resource("/bdi/glue/proc/testdefs/00-proc.md"))
+                //.overview(jdbcFeatures, 1, FeatureSummary)
+                .features(procFeatures, 1)
                 // ---
                 .overview(TagViews)
                 .tagDictionary(new TagDictionaryLoader().fromUTF8PropertiesResource("/bdi/glue/tags.properties"))
