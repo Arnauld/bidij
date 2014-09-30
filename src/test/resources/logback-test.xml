@@ -7,6 +7,7 @@
     </appender>
 
     <logger name="bdi.glue.http.httpclient" level="debug"/>
+    <logger name="bdi.glue.ssh" level="debug"/>
 
     <logger name="org.eclipse.jetty" level="info"/>
     <logger name="org.eclipse.jetty.io" level="warn"/>

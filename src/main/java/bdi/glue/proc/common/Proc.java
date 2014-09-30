@@ -1,8 +1,12 @@
 package bdi.glue.proc.common;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
@@ -17,10 +21,11 @@ import static java.lang.ProcessBuilder.Redirect.appendTo;
 public class Proc {
     private static final AtomicInteger idGen = new AtomicInteger();
 
-
     private static String newPid() {
         return "pid_" + new SimpleDateFormat("yyyyMMdd'_'HHmmss").format(new Date()) + "_" + idGen.incrementAndGet();
     }
+
+    private Logger log = LoggerFactory.getLogger(Proc.class);
 
     private final String pid;
     private final String[] cmdarray;
@@ -40,11 +45,19 @@ public class Proc {
     }
 
     public void start() throws IOException {
+        if (!outputDir.exists() && !outputDir.mkdirs())
+            throw new ProcException("Fail to create output dir at '" + outputDir.getAbsolutePath() + "'");
+
         process = new ProcessBuilder(cmdarray)
                 .directory(workingDir)
                 .redirectOutput(appendTo(getOut()))
                 .redirectError(appendTo(getErr()))
                 .start();
+        
+        log.info("Process {} with command '{}' spawned (out: {})",
+                pid,
+                Arrays.toString(cmdarray),
+                getOut().getAbsolutePath());
     }
 
     private File getErr() {
@@ -68,7 +81,9 @@ public class Proc {
     }
 
     public void waitForTermination(long timeout, TimeUnit timeoutUnit) throws InterruptedException, TimeoutException {
-        if (!process.waitFor(timeout, timeoutUnit))
+        if (!process.waitFor(timeout, timeoutUnit)) {
+            process.destroy();
             throw new TimeoutException("Proc didn't terminate in time");
+        }
     }
 }

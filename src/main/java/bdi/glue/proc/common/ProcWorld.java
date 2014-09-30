@@ -15,8 +15,8 @@ public class ProcWorld {
     private String currentDir;
     private String outputDir;
     //
-    private long terminationTimeout = 2;
-    private TimeUnit terminationTimeoutUnit = TimeUnit.SECONDS;
+    private long defaultTerminationTimeout = 2;
+    private TimeUnit defaultTerminationTimeoutUnit = TimeUnit.SECONDS;
 
 
     public void setCurrentDir(String currentDir) {
@@ -44,9 +44,8 @@ public class ProcWorld {
 
     public String getOutputDir() {
         if (outputDir == null) {
-            Path currentRelativePath = Paths.get("");
+            Path currentRelativePath = Paths.get("out");
             outputDir = currentRelativePath.toAbsolutePath().toString();
-
         }
         return outputDir;
     }
@@ -55,23 +54,35 @@ public class ProcWorld {
         this.outputDir = outputDir;
     }
 
-    public long getTerminationTimeout() {
-        return terminationTimeout;
+    public long getDefaultTerminationTimeout() {
+        return defaultTerminationTimeout;
     }
 
-    public void setTerminationTimeout(long terminationTimeout) {
-        this.terminationTimeout = terminationTimeout;
+    public void setDefaultTerminationTimeout(long terminationTimeout) {
+        this.defaultTerminationTimeout = terminationTimeout;
     }
 
-    public TimeUnit getTerminationTimeoutUnit() {
-        return terminationTimeoutUnit;
+    public TimeUnit getDefaultTerminationTimeoutUnit() {
+        return defaultTerminationTimeoutUnit;
     }
 
-    public void setTerminationTimeoutUnit(TimeUnit terminationTimeoutUnit) {
-        this.terminationTimeoutUnit = terminationTimeoutUnit;
+    public void setDefaultTerminationTimeoutUnit(TimeUnit terminationTimeoutUnit) {
+        this.defaultTerminationTimeoutUnit = terminationTimeoutUnit;
     }
 
     public void waitTermination(Proc proc) throws TimeoutException, InterruptedException {
+        waitForTermination(proc, defaultTerminationTimeout, defaultTerminationTimeoutUnit);
+    }
+
+    public void waitForTermination(Proc proc, long terminationTimeout, TimeUnit terminationTimeoutUnit) throws TimeoutException, InterruptedException {
         proc.waitForTermination(terminationTimeout, terminationTimeoutUnit);
+    }
+
+    public void waitLastProcessTermination() throws TimeoutException, InterruptedException {
+        waitForTermination(peekProcess(), defaultTerminationTimeout, defaultTerminationTimeoutUnit);
+    }
+
+    public void waitLastProcessTermination(int timeout, TimeUnit timeoutUnit) throws TimeoutException, InterruptedException {
+        waitForTermination(peekProcess(), timeout, timeoutUnit);
     }
 }

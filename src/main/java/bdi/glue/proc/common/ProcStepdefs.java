@@ -10,6 +10,8 @@ import org.assertj.core.util.Strings;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -62,6 +64,17 @@ public class ProcStepdefs {
         procWorld.pushProcess(proc);
     }
 
+    @When("^I wait for the process to terminate$")
+    public void waitLastProcessTermination() throws TimeoutException, InterruptedException {
+        procWorld.waitLastProcessTermination();
+    }
+
+
+    @When("^I wait at most (\\d+) seconds for the process to terminate$")
+    public void waitLastProcessTermination(int timeoutInSeconds) throws TimeoutException, InterruptedException {
+        procWorld.waitLastProcessTermination(timeoutInSeconds, TimeUnit.SECONDS);
+    }
+
     //-------------------------------------------------------------------------
     //   _______ _    _ ______ _   _
     //  |__   __| |  | |  ____| \ | |
@@ -97,4 +110,5 @@ public class ProcStepdefs {
         }
 
     }
+
 }
