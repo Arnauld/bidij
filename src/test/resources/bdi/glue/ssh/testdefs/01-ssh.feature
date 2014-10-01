@@ -18,3 +18,5 @@ Feature: fooforge.com ssh logins
     And an interactive ssh session opened on "127.0.0.1:2222" with the following credentials:
       | username |
       | vagrant  |
+    When through ssh, I run `ls -al`
+    Then the ssh session output should contain "zog"

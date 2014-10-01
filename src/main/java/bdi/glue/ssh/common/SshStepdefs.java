@@ -2,8 +2,15 @@ package bdi.glue.ssh.common;
 
 import bdi.glue.env.VariableResolver;
 import cucumber.api.java.en.Given;
+import cucumber.api.java.en.Then;
+import cucumber.api.java.en.When;
+import org.assertj.core.api.StringAssert;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.regex.Pattern;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
@@ -46,6 +53,49 @@ public class SshStepdefs {
 
     private void openSession() {
         SshGateway sshGateway = sshWorld.getSshGateway();
-        sshGateway.openSession(sshWorld.currentSessionBuilder());
+        SshSession sshSession = sshGateway.openSession(sshWorld.currentSessionBuilder());
+        sshWorld.pushSession(sshSession);
     }
+
+    //-------------------------------------------------------------------------
+    //    \ \        / / |  | |  ____| \ | |
+    //     \ \  /\  / /| |__| | |__  |  \| |
+    //      \ \/  \/ / |  __  |  __| | . ` |
+    //       \  /\  /  | |  | | |____| |\  |
+    //        \/  \/   |_|  |_|______|_| \_|
+    //-------------------------------------------------------------------------
+
+    @When("^through ssh, I run `([^`]+)`$")
+    public void runSshCommand(String command) throws Throwable {
+        SshSession sshSession = sshWorld.peekSession();
+        sshSession.runCommand(command);
+    }
+
+    //-------------------------------------------------------------------------
+    //   _______ _    _ ______ _   _
+    //  |__   __| |  | |  ____| \ | |
+    //     | |  | |__| | |__  |  \| |
+    //     | |  |  __  |  __| | . ` |
+    //     | |  | |  | | |____| |\  |
+    //     |_|  |_|  |_|______|_| \_|
+    //-------------------------------------------------------------------------
+
+    @Then("^the ssh session output should (contain|satisfy) \"(.*?)\"$")
+    public void assertSshOutputVerifies(String comparator,
+                                        String expectedText) throws Throwable {
+        SshSession sshSession = sshWorld.peekSession();
+        String out = sshSession.getOut();
+        StringAssert stringAssert = assertThat(out);
+        switch (comparator) {
+            case "contain":
+                stringAssert.contains(expectedText);
+                break;
+            case "satisfy":
+                Pattern p = Pattern.compile(expectedText);
+                assertThat(p.matcher(out).find()).isTrue();
+        }
+
+    }
+
+
 }

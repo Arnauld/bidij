@@ -42,8 +42,7 @@ public class SshGateway {
                 session.setConfig("StrictHostKeyChecking", "no");
             session.connect(builder.getConnectTimeout());   // making a connection with timeout.
 
-            Channel channel = session.openChannel(builder.getChannelType());
-            return new SshSession(session, channel);
+            return new SshSession(session, builder.getChannelType());
         } catch (JSchException e) {
             throw new SshException(e);
         }

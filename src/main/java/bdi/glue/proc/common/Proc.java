@@ -53,7 +53,7 @@ public class Proc {
                 .redirectOutput(appendTo(getOut()))
                 .redirectError(appendTo(getErr()))
                 .start();
-        
+
         log.info("Process {} with command '{}' spawned (out: {})",
                 pid,
                 Arrays.toString(cmdarray),
