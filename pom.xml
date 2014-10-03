@@ -170,6 +170,7 @@
         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
         <!-- HTTP -->
         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
@@ -244,6 +245,18 @@
             <artifactId>mockito-all</artifactId>
             <version>1.9.5</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.jayway.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+            <version>1.6.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.jayway.awaitility</groupId>
+            <artifactId>awaitility-java8</artifactId>
+            <version>1.6.1</version>
         </dependency>
     </dependencies>
 

@@ -7,9 +7,10 @@ import cucumber.api.java.en.When;
 import org.assertj.core.api.StringAssert;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
+import static com.jayway.awaitility.Awaitility.await;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -80,21 +81,29 @@ public class SshStepdefs {
     //     |_|  |_|  |_|______|_| \_|
     //-------------------------------------------------------------------------
 
-    @Then("^the ssh session output should (contain|satisfy) \"(.*?)\"$")
-    public void assertSshOutputVerifies(String comparator,
+    @Then("^within (\\d+) (seconds?|minutes?), the ssh session output should (contain|satisfy) \"(.*?)\"$")
+    public void assertSshOutputVerifies(long timeout,
+                                        String timeoutUnit,
+                                        String comparator,
                                         String expectedText) throws Throwable {
-        SshSession sshSession = sshWorld.peekSession();
-        String out = sshSession.getOut();
-        StringAssert stringAssert = assertThat(out);
-        switch (comparator) {
-            case "contain":
-                stringAssert.contains(expectedText);
-                break;
-            case "satisfy":
-                Pattern p = Pattern.compile(expectedText);
-                assertThat(p.matcher(out).find()).isTrue();
-        }
+        TimeUnit unit = TimeUnit.SECONDS;
+        if (timeoutUnit.toLowerCase().startsWith("minute"))
+            unit = TimeUnit.MINUTES;
 
+        await().atMost(timeout, unit).until(() -> {
+                    SshSession sshSession = sshWorld.peekSession();
+                    String out = sshSession.getOut();
+                    StringAssert stringAssert = assertThat(out);
+                    switch (comparator) {
+                        case "contain":
+                            stringAssert.contains(expectedText);
+                            break;
+                        case "satisfy":
+                            Pattern p = Pattern.compile(expectedText);
+                            assertThat(p.matcher(out).find()).isTrue();
+                    }
+                }
+        );
     }
 
 

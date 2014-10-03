@@ -10,7 +10,7 @@ Feature: fooforge.com ssh logins
       | vagrant  | foobar   |
 
 
-  Scenario: SSH auth. with private key
+  Scenario: SSH authentication with private key
 
     Given a default vm popped
     # e.g. "~/.ssh/id_dsa"
@@ -19,4 +19,4 @@ Feature: fooforge.com ssh logins
       | username |
       | vagrant  |
     When through ssh, I run `ls -al`
-    Then the ssh session output should contain "zog"
+    Then within 5 seconds, the ssh session output should contain ".vbox_version"
