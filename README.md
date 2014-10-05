@@ -132,10 +132,9 @@ This is easily and automatically accomplished through pico-container:
 ```
 
 
-e.g. to customize default HTTP basic auth from a custom properties file.
+#### Customize default HTTP basic auth from a custom properties file.
 
 ```java
-
 public class MyApplicationStepdefs {
 
     private final HttpWorld httpWorld;
@@ -159,6 +158,35 @@ public class MyApplicationStepdefs {
     }
 }
 ```
+
+#### Customize JDBC settings from a custom properties file.
+
+```java
+public class MyApplicationStepdefs {
+
+    private final JdbcWorld jdbcWorld;
+    private final VariableResolver variableResolver;
+
+    public MyApplicationStepdefs(JdbcWorld jdbcWorld, VariableResolver variableResolver) {
+        this.jdbcWorld = jdbcWorld;
+        this.variableResolver = variableResolver;
+    }
+    
+    @Given("^a sample database running and defining \"([^\"]*)\" jdbc configuration$")
+    public void sampleDBAndStoreAndKeepPArametersUsing(String confName) throws Throwable {
+        SampleDB sampleDB = SampleDB.createFromWorkingDirAndDefaultCredentials(new TestSettings().buildDir());
+        sampleDB.init();
+        jdbcWorld.defineConfAndSetAsCurrent(
+                confName,
+                new JdbcConf(sampleDB.driver(),
+                        sampleDB.url(),
+                        sampleDB.username(),
+                        sampleDB.password())
+        );
+    }
+}
+```
+
 
 # Inspirations
 
