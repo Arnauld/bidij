@@ -2,7 +2,7 @@
 
 ## What?
 
-Predefined steps for Java/Cucumber
+A cucumber-nagios port to java, predefined steps for Java/Cucumber
 
 * HTTP
 * JDBC
