@@ -4,10 +4,8 @@ import bdi.TestSettings;
 import bdi.glue.GlobalWorld;
 import bdi.glue.http.common.HttpWorld;
 import bdi.glue.http.testdefs.app.SampleApp;
-import cucumber.api.PendingException;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
-import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import org.eclipse.jetty.server.Server;
 
@@ -33,7 +31,7 @@ public class SampleAppStepdefs {
 
     @After
     public void tearDown() throws Exception {
-        if(server!=null) {
+        if (server != null) {
             server.stop();
             server.join();
         }
@@ -53,11 +51,11 @@ public class SampleAppStepdefs {
         globalWorld.put(Server.class, server);
     }
 
-    @And("^default basic auth credentials set$")
+    @Given("^default basic auth credentials set$")
     public void default_basic_auth_credentials_set() throws Throwable {
         httpWorld.currentRequestBuilder()
-                    .basicAuthCredentials(
-                            testSettings.getProperty("username"),
-                            testSettings.getProperty("password"));
+                .basicAuthCredentials(
+                        testSettings.getProperty("username"),
+                        testSettings.getProperty("password"));
     }
 }
