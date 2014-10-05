@@ -1,6 +1,4 @@
-Feature: fooforge.com ssh logins
-  As a user of fooforge.com
-  I need to login remotely
+Feature: ssh access
 
   @Ignore
   Scenario: Basic ssh
