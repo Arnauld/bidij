@@ -8,6 +8,7 @@ import bdi.TestSettings;
 import bdi.glue.http.testdefs.HttpFeatures;
 import bdi.glue.jdbc.testdefs.JdbcFeatures;
 import bdi.glue.proc.testdefs.ProcFeatures;
+import bdi.glue.ssh.testdefs.SshFeatures;
 import com.itextpdf.text.DocumentException;
 import gutenberg.itext.ITextContext;
 import gutenberg.itext.SimpleEmitter;
@@ -31,12 +32,36 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import static tzatziki.pdf.support.DefaultPdfReportBuilder.Overview.FeatureSummary;
 import static tzatziki.pdf.support.DefaultPdfReportBuilder.Overview.TagViews;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({HttpFeatures.class, JdbcFeatures.class, ProcFeatures.class})
+@Suite.SuiteClasses({
+        HttpFeatures.class,
+        JdbcFeatures.class,
+        ProcFeatures.class,
+        SshFeatures.class
+})
 public class TestSuite {
+
+    public static class GlueAndFeature {
+        public final List<FeatureExec> features;
+        public final Grammar grammar;
+
+        public GlueAndFeature(List<FeatureExec> features, Grammar grammar) {
+            this.features = features;
+            this.grammar = grammar;
+        }
+    }
+
+    private static GlueAndFeature load(String pkg) throws IOException {
+        TestSettings settings = new TestSettings();
+        File sourceDir = new File(settings.projectDir(), "src/main/java/bdi/glue/" + pkg);
+        File buildDir = new File(settings.buildDir());
+        Grammar grammar = new GrammarParser().usingSourceDirectory(sourceDir).process();
+
+        List<FeatureExec> features = loadFeatures(buildDir, "/" + pkg);
+        return new GlueAndFeature(features, grammar);
+    }
 
     @AfterClass
     public static void generateReport() throws IOException, DocumentException {
@@ -44,12 +69,11 @@ public class TestSuite {
         File buildDir = new File(settings.buildDir());
         File fileOut = new File(buildDir, "features.pdf");
 
-        File sourceDir = new File(settings.projectDir(), "src/main/java/bdi/glue");
-        Grammar grammar = new GrammarParser().usingSourceDirectory(sourceDir).process();
 
-        List<FeatureExec> httpFeatures = loadFeatures(buildDir, "/http");
-        List<FeatureExec> jdbcFeatures = loadFeatures(buildDir, "/jdbc");
-        List<FeatureExec> procFeatures = loadFeatures(buildDir, "/proc");
+        GlueAndFeature httpGF = load("http");
+        GlueAndFeature jdbcGF = load("jdbc");
+        GlueAndFeature procGF = load("proc");
+        GlueAndFeature sshGF = load("ssh");
 
         new DefaultPdfReportBuilder()
                 .using(new Configuration()
@@ -61,20 +85,24 @@ public class TestSuite {
                 .title("bidij")
                 .subTitle("Behavior Driven Infrastructure support for Java")
                 .markup(Markdown.fromUTF8Resource("/bdi/glue/00-preambule.md"))
-                .emit(grammar(grammar))
-                // --- HTTP
+                        // --- HTTP
                 .markup(Markdown.fromUTF8Resource("/bdi/glue/http/testdefs/00-http.md"))
-                //.overview(httpFeatures, 1, FeatureSummary)
-                .features(httpFeatures, 1)
-                // --- JDBC
+                        //.overview(httpFeatures, 1, FeatureSummary)
+                .emit(grammar(httpGF.grammar))
+                .features(httpGF.features, 1)
+                        // --- JDBC
                 .markup(Markdown.fromUTF8Resource("/bdi/glue/jdbc/testdefs/00-jdbc.md"))
-                //.overview(jdbcFeatures, 1, FeatureSummary)
-                .features(jdbcFeatures, 1)
-                // --- Proc
+                .emit(grammar(jdbcGF.grammar))
+                .features(jdbcGF.features, 1)
+                        // --- Proc
                 .markup(Markdown.fromUTF8Resource("/bdi/glue/proc/testdefs/00-proc.md"))
-                //.overview(jdbcFeatures, 1, FeatureSummary)
-                .features(procFeatures, 1)
-                // ---
+                .emit(grammar(procGF.grammar))
+                .features(procGF.features, 1)
+                        // --- Ssh
+                .markup(Markdown.fromUTF8Resource("/bdi/glue/ssh/testdefs/00-ssh.md"))
+                .emit(grammar(sshGF.grammar))
+                .features(sshGF.features, 1)
+                        // ---
                 .overview(TagViews)
                 .tagDictionary(new TagDictionaryLoader().fromUTF8PropertiesResource("/bdi/glue/tags.properties"))
                 .tagViews(

@@ -8,3 +8,8 @@
   I want some predefined steps to execute specified command is a separate process
   
   **Warning** the triggered processes are launch in the same machine where the current scenario is running. 
+
+
+## Grammar
+
+List of predefined and supported steps relatives to Processes:

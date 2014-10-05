@@ -16,3 +16,8 @@
   As an automation tester
 
   I want some predefined steps to access and query Database
+
+
+## Grammar
+
+List of predefined and supported steps relatives to JDBC:
