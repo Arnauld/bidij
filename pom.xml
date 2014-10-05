@@ -10,7 +10,7 @@
     </parent>
 
     <groupId>org.technbolts</groupId>
-    <artifactId>bdi</artifactId>
+    <artifactId>bidij</artifactId>
     <version>0.2.0</version>
 
     <licenses>
@@ -30,8 +30,8 @@
 
     <scm>
         <connection>scm:git:git@github.com:Arnauld/bdi.git</connection>
-        <developerConnection>scm:git:git@github.com:Arnauld/bdi.git</developerConnection>
-        <url>git@github.com:Arnauld/bdi.git</url>
+        <developerConnection>scm:git:git@github.com:Arnauld/bidij.git</developerConnection>
+        <url>git@github.com:Arnauld/bidij.git</url>
         <tag>HEAD</tag>
     </scm>
 
@@ -349,7 +349,7 @@
                 <artifactId>versions-maven-plugin</artifactId>
                 <version>2.1</version>
             </plugin>
-            
+
             <plugin>
                 <artifactId>maven-scm-plugin</artifactId>
                 <version>1.8.1</version>
