@@ -1,9 +1,9 @@
 package bdi.glue.http.common;
 
+import bdi.glue.util.StringAssertions;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
-import org.assertj.core.api.StringAssert;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONCompare;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -83,7 +83,7 @@ public class RawHttpStepdefs {
     }
 
     @Given("^basic auth credentials set to \"([^\"]*)\" and \"([^\"]*)\"$")
-    public void given_basic_auth_credentials_set_to(String username, String password) throws Throwable {
+    public void given_basic_auth_credentials_set_to(String username, String password) {
         httpWorld
                 .currentRequestBuilder()
                 .basicAuthCredentials(username, password);
@@ -95,13 +95,14 @@ public class RawHttpStepdefs {
      * combined with a quality factor, as parameters giving the relative degree of preference between
      * the different MIME Types lists.
      *
+     *
      * * [Content negotiation - MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Content_negotiation)
      * * [rfc2616 section 12](http://www.w3.org/Protocols/rfc2616/rfc2616-sec12.html)
      *
      * @param contentTypes comma-separated lists of MIME type (e.g. "application/json" or "text/html" ...)
      */
     @Given("^a content format negotiation set to \"([^\"]*)\"$")
-    public void given_content_format_negociation_set_to(String contentTypes) throws Throwable {
+    public void given_content_format_negociation_set_to(String contentTypes) {
         httpWorld
                 .currentRequestBuilder()
                 .header(new Header("Accept", contentTypes));
@@ -211,26 +212,9 @@ public class RawHttpStepdefs {
     @Then("^the response's body should (start with|end with|match|contain|be) \"(.*)\"$")
     public void then_response_body_should_satisfy(String comparator, String expectedText) {
         HttpResponse response = httpWorld.lastResponse();
-        StringAssert stringAssert = assertThat(response.bodyAsText());
-        switch (comparator) {
-            case "match":
-                stringAssert.matches(expectedText);
-                break;
-            case "contain":
-                stringAssert.contains(expectedText);
-                break;
-            case "be":
-                stringAssert.isEqualTo(expectedText);
-                break;
-            case "start with":
-                stringAssert.startsWith(expectedText);
-                break;
-            case "end with":
-                stringAssert.endsWith(expectedText);
-                break;
-            default:
-                throw new IllegalArgumentException("Unsupported comparator '" + comparator + "'");
-        }
+
+        StringAssertions.Mode mode = StringAssertions.lookupMode(comparator);
+        StringAssertions.apply(mode, response.bodyAsText(), expectedText);
     }
 
     @Then("^the response's body should (match|contain|be):$")
@@ -241,20 +225,9 @@ public class RawHttpStepdefs {
     @Then("^the response's body should not (match|contain|be) \"([^\"]*)\"$")
     public void then_response_body_should_not_satisfy(String comparator, String expectedText) {
         HttpResponse response = httpWorld.lastResponse();
-        StringAssert stringAssert = assertThat(response.bodyAsText());
-        switch (comparator) {
-            case "match":
-                stringAssert.doesNotMatch(expectedText);
-                break;
-            case "contain":
-                stringAssert.doesNotContain(expectedText);
-                break;
-            case "be":
-                stringAssert.isNotEqualTo(expectedText);
-                break;
-            default:
-                throw new IllegalArgumentException("Unsupported comparator '" + comparator + "'");
-        }
+
+        StringAssertions.Mode mode = StringAssertions.lookupMode(comparator);
+        StringAssertions.apply(mode.negate(), response.bodyAsText(), expectedText);
     }
 
     @Then("^the json response's body should (contain|be):$")

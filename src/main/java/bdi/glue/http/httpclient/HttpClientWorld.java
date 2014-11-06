@@ -23,14 +23,16 @@ public class HttpClientWorld {
     private HttpClientContext httpClientContext;
 
     public BasicCookieStore cookieStore() {
-        if (cookieStore == null)
+        if (cookieStore == null) {
             cookieStore = new BasicCookieStore();
+        }
         return cookieStore;
     }
 
     public void setCookieStore(BasicCookieStore cookieStore) {
-        if (httpClientBuilder != null || httpclient != null)
+        if (httpClientBuilder != null || httpclient != null) {
             throw new IllegalStateException("HttpClientBuilder or HttpClient already instanciated");
+        }
         this.cookieStore = cookieStore;
     }
 
@@ -55,28 +57,32 @@ public class HttpClientWorld {
                     .setDefaultCookieStore(cookieStore());
             for (Function<HttpClientBuilder, HttpClientBuilder> configurer : builderConfigurers) {
                 httpClientBuilder = configurer.apply(httpClientBuilder);
-                if (httpClientBuilder == null)
+                if (httpClientBuilder == null) {
                     throw new IllegalStateException("Configurer returns null... (" + configurer + ")");
+                }
             }
         }
         return httpClientBuilder;
     }
 
     public void registerBuilderConfigurer(Function<HttpClientBuilder, HttpClientBuilder> configurer) {
-        if (httpClientBuilder != null || httpclient != null)
+        if (httpClientBuilder != null || httpclient != null) {
             throw new IllegalStateException("HttpClientBuilder or HttpClient already instanciated");
+        }
         builderConfigurers.add(configurer);
     }
 
     public void registerClientConfigurer(Function<CloseableHttpClient, CloseableHttpClient> configurer) {
-        if (httpClientBuilder != null || httpclient != null)
+        if (httpClientBuilder != null || httpclient != null) {
             throw new IllegalStateException("HttpClientBuilder or HttpClient already instanciated");
+        }
         clientConfigurers.add(configurer);
     }
 
     public HttpClientContext httpClientContext() {
-        if (httpClientContext == null)
+        if (httpClientContext == null) {
             httpClientContext = HttpClientContext.create();
+        }
         return httpClientContext;
     }
 

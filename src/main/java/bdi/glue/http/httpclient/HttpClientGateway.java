@@ -164,7 +164,7 @@ public class HttpClientGateway implements HttpGateway {
 
     private void configureParameters(HttpRequestBuilder req, URIBuilder uriBuilder) {
         for (Parameter parameter : req.getParameters()) {
-            uriBuilder = uriBuilder.setParameter(parameter.parameterName, parameter.parameterValue);
+            uriBuilder = uriBuilder.setParameter(parameter.getParameterName(), parameter.getParameterValue());
         }
     }
 

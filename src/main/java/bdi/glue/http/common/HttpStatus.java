@@ -320,6 +320,7 @@ public enum HttpStatus {
 
     /**
      * Return the integer value of this status code.
+     * @return http code
      */
     public int value() {
         return this.value;
@@ -327,6 +328,8 @@ public enum HttpStatus {
 
     /**
      * Returns the HTTP status series of this status code.
+     *
+     * @return Http series the code belongs to
      * @see HttpStatus.Series
      */
     public Series series() {
@@ -334,7 +337,7 @@ public enum HttpStatus {
     }
 
     /**
-     * Return a string representation of this status code.
+     * @return a string representation of this status code.
      */
     @Override
     public String toString() {
@@ -378,6 +381,7 @@ public enum HttpStatus {
 
         /**
          * Return the integer value of this status series. Ranges from 1 to 5.
+         * @return Series code
          */
         public int value() {
             return this.value;

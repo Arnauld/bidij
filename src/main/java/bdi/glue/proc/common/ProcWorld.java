@@ -36,10 +36,11 @@ public class ProcWorld {
     }
 
     public Proc peekProcess() {
-        if (hasProcess())
+        if (hasProcess()) {
             return processStack.peek();
-        else
+        } else {
             throw new ProcException("No process registered");
+        }
     }
 
     public String getOutputDir() {

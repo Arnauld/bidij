@@ -12,8 +12,9 @@ public class SshWorld {
     private final Stack<SshSession> sessionStack = new Stack<>();
 
     public SshSessionBuilder currentSessionBuilder() {
-        if (sessionBuilder == null)
+        if (sessionBuilder == null) {
             sessionBuilder = new SshSessionBuilder();
+        }
         return sessionBuilder;
     }
 
@@ -34,9 +35,11 @@ public class SshWorld {
     }
 
     public SshSession peekSession() {
-        if (hasSession())
+        if (hasSession()) {
             return sessionStack.peek();
-        else
+        }
+        else {
             throw new SshException("No session registered");
+        }
     }
 }

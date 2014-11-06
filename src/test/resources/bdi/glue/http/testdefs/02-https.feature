@@ -48,7 +48,7 @@ Feature: HTTPS steps
 
   @http_secure
   @http_secure__allow_all_hostname
-  Scenario: GET on https with basic auth specifying credentials
+  Scenario: GET on https with basic auth specifying credentials and parameters
 
     Given a sample server running on port 8080 and on secure port 8083
     Given an host set to "https://localhost:8083"

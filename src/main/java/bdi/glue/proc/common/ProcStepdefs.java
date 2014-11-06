@@ -1,6 +1,7 @@
 package bdi.glue.proc.common;
 
 import bdi.glue.env.VariableResolver;
+import bdi.glue.util.StringAssertions;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -10,6 +11,8 @@ import org.assertj.core.util.Strings;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
@@ -38,7 +41,7 @@ public class ProcStepdefs {
     //-------------------------------------------------------------------------
 
     @Given("^the current working directory has been set to \"(.*?)\"$")
-    public void defineCurrentDir(String dir) throws Throwable {
+    public void defineCurrentDir(String dir) {
         procWorld.setCurrentDir(variableResolver.resolve(dir));
     }
 
@@ -52,9 +55,12 @@ public class ProcStepdefs {
 
     /**
      * Executes the specified command and arguments in a separate process with the specified environment.
+     *
+     * @param command to execute
+     * @throws IOException when spawning process
      */
     @When("^I run `([^`]*)`$")
-    public void runCommand(String command) throws Throwable {
+    public void runCommand(String command) throws IOException {
         Proc proc = new Proc(
                 command,
                 new File(procWorld.getCurrentDir()),
@@ -84,10 +90,10 @@ public class ProcStepdefs {
     //     |_|  |_|  |_|______|_| \_|
     //-------------------------------------------------------------------------
 
-    @Then("^(once finished, )?the last command output should (contain|be|equal to|satisfy):$")
+    @Then("^(once finished, )?the last command output should (contain|be|equal to|satisfy|partially satisfy):$")
     public void assertLastCommandOutputVerifies(String onceFinished,
                                                 String comparator,
-                                                String expectedText) throws Throwable {
+                                                String expectedText) throws TimeoutException, InterruptedException, IOException {
         Proc proc = procWorld.peekProcess();
 
         if (!Strings.isNullOrEmpty(onceFinished)) {
@@ -95,20 +101,7 @@ public class ProcStepdefs {
         }
 
         String s = IOUtils.toString(new FileInputStream(proc.getOut()));
-        StringAssert stringAssert = assertThat(s);
-        switch (comparator) {
-            case "contain":
-                stringAssert.contains(expectedText);
-                break;
-            case "be":
-            case "equal to":
-                stringAssert.isEqualTo(expectedText);
-                break;
-            case "satisfy":
-                Pattern p = Pattern.compile(expectedText);
-                assertThat(p.matcher(s).find()).isTrue();
-        }
-
+        StringAssertions.apply(comparator, s, expectedText);
     }
 
 }

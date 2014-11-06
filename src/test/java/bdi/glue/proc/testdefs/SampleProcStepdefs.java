@@ -28,7 +28,7 @@ public class SampleProcStepdefs {
     }
 
     @Given("^a new temporary directory kept in variable \"(.*?)\"$")
-    public void a_new_temporary_directory_kept_in_variable(String variableName) throws Throwable {
+    public void a_new_temporary_directory_kept_in_variable(String variableName) {
         String buildDir = new TestSettings().buildDir();
         String id = "proc" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + "_" + idGen.incrementAndGet();
         File tmpDir = new File(buildDir, id);

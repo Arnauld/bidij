@@ -40,7 +40,7 @@ import static tzatziki.pdf.support.DefaultPdfReportBuilder.Overview.TagViews;
         ProcFeatures.class,
         SshFeatures.class
 })
-public class TestSuite {
+public class FeatureSuiteTest {
 
     public static class GlueAndFeature {
         public final List<FeatureExec> features;

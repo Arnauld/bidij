@@ -4,11 +4,13 @@ import bdi.glue.env.VariableResolver;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+import org.assertj.core.api.Assertions;
 import org.assertj.core.api.IntegerAssert;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
@@ -36,12 +38,12 @@ public class JdbcStepdefs {
     //-------------------------------------------------------------------------
 
     @Given("^the \"([^\"]*)\" jdbc configuration has been applied$")
-    public void defineConfAsCurrent(String confName) throws Throwable {
+    public void defineConfAsCurrent(String confName) {
         jdbcWorld.defineCurrentConf(confName);
     }
 
     @Given("^the following jdbc configurations:$")
-    public void defineConfs(List<JdbcConfProto> protoz) throws Throwable {
+    public void defineConfs(List<JdbcConfProto> protoz) {
         for (JdbcConfProto proto : protoz) {
             jdbcWorld.defineConf(proto.configurationName, proto.jdbcConf(variableResolver));
         }
@@ -56,7 +58,7 @@ public class JdbcStepdefs {
     //-------------------------------------------------------------------------
 
     @When("^a query is made on table \"([^\"]*)\"$")
-    public void selectRowData(String tableName) throws Throwable {
+    public void selectRowData(String tableName) throws SQLException {
         try (Connection c = jdbcWorld.currentConf().openConnection()) {
             int maxFetchSize = jdbcWorld.maxFetchSize();
 
@@ -65,8 +67,9 @@ public class JdbcStepdefs {
 
             Rows rows = new Rows();
             ResultSet rSet = stmt.executeQuery("select count(*) from " + tableName);
-            if (rSet.next())
+            if (rSet.next()) {
                 rows.defineNumberOfRows(rSet.getInt(1));
+            }
             rSet.close();
 
             rSet = stmt.executeQuery("select * from " + tableName);
@@ -81,8 +84,9 @@ public class JdbcStepdefs {
                     o[i] = rSet.getObject(i + 1);
                 }
                 rows.appendRow(o);
-                if (--maxFetchSize == 0)
+                if (--maxFetchSize == 0) {
                     return;
+                }
             }
 
             jdbcWorld.lastResult(rows);
@@ -99,7 +103,7 @@ public class JdbcStepdefs {
     //-------------------------------------------------------------------------
 
     @Then("^the number of rows returned should be (greater than|greater than or equal to|equal to|lesser than|lesser than or equal to) (\\d+)$")
-    public void assertNumberOfRowsOnLastResult(String comparator, int expectedNbRows) throws Throwable {
+    public void assertNumberOfRowsOnLastResult(String comparator, int expectedNbRows) {
         Rows rows = jdbcWorld.lastResult();
         int nbRows = rows.getNbRows();
         IntegerAssert integerAssert = assertThat(nbRows);
@@ -120,6 +124,8 @@ public class JdbcStepdefs {
             case "lesser than or equal to":
                 integerAssert.isLessThanOrEqualTo(expectedNbRows);
                 break;
+            default:
+                Assertions.fail("Unsupported comparator: '" + comparator + "'");
         }
     }
 }

@@ -8,7 +8,7 @@ Feature: Check the Process steps
     And the current working directory has been set to "${workingDir}"
     When I run `touch filemode.file`
     And I run `ls -al`
-    Then once finished, the last command output should satisfy:
+    Then once finished, the last command output should partially satisfy:
     """
     \Q-rw-r--r--\E (.+) filemode.file
     """
