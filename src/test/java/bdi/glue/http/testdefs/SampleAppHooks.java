@@ -16,7 +16,7 @@ import java.security.NoSuchAlgorithmException;
  */
 public class SampleAppHooks {
 
-    private HttpClientWorld httpClientWorld;
+    private final HttpClientWorld httpClientWorld;
     private boolean allowAllHostname;
 
     public SampleAppHooks(HttpClientWorld httpClientWorld) {
@@ -26,7 +26,7 @@ public class SampleAppHooks {
     @Before(value = "@http_secure", order = 10000)
     public void configureAuthentication() {
         httpClientWorld.registerClientConfigurer(client -> client);
-        httpClientWorld.registerBuilderConfigurer(builder -> configureSSL(builder));
+        httpClientWorld.registerBuilderConfigurer(this::configureSSL);
     }
 
     @Before(value = "@http_secure__allow_all_hostname", order = 100)

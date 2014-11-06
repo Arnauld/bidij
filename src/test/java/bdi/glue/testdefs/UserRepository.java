@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
 public class UserRepository {
-    private AtomicInteger idGen = new AtomicInteger();
+    private final AtomicInteger idGen = new AtomicInteger();
     private Map<Integer, User> users = new ConcurrentHashMap<>();
 
     public UserRepository() {

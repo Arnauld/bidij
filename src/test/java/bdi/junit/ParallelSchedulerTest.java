@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ParallelSchedulerTest {
 
-    private static ConcurrentLinkedQueue<String> out = new ConcurrentLinkedQueue<>();
+    private static final ConcurrentLinkedQueue<String> out = new ConcurrentLinkedQueue<>();
 
     @Test
     public void testcase_should_launch_in_dedicated_thread() {

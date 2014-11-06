@@ -3,7 +3,6 @@ package bdi.glue.ssh.testdefs;
 import bdi.TestSettings;
 import bdi.glue.env.VariableResolver;
 import bdi.glue.proc.common.ProcStepdefs;
-import bdi.glue.proc.common.ProcWorld;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
@@ -18,15 +17,13 @@ import java.util.concurrent.TimeUnit;
  */
 public class SampleSshStepdefs {
 
-    private final ProcWorld procWorld;
     private final ProcStepdefs proc;
     private final VariableResolver variableResolver;
     //
     private boolean vmUp;
     private SshServer sshd;
 
-    public SampleSshStepdefs(ProcWorld procWorld, ProcStepdefs proc, VariableResolver variableResolver) {
-        this.procWorld = procWorld;
+    public SampleSshStepdefs(ProcStepdefs proc, VariableResolver variableResolver) {
         this.proc = proc;
         this.variableResolver = variableResolver;
     }

@@ -20,12 +20,12 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class SampleDB {
 
-    private static AtomicInteger idGen = new AtomicInteger();
+    private static final AtomicInteger idGen = new AtomicInteger();
     public static String generateId() {
         return new SimpleDateFormat("yyyyMMdd'_'HHmmss").format(new Date()) + "_" + idGen.incrementAndGet();
     }
 
-    private Logger log = LoggerFactory.getLogger(SampleDB.class);
+    private final Logger log = LoggerFactory.getLogger(SampleDB.class);
 
     private final String url;
     private final String username;

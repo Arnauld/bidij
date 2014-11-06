@@ -66,7 +66,7 @@ public class ComponentLifecycleCucumberTest {
     }
 
     public static class SimpleHooks {
-        public List<String> invoked = new ArrayList<>();
+        public final List<String> invoked = new ArrayList<>();
 
         @Before
         public void before() {
@@ -79,7 +79,7 @@ public class ComponentLifecycleCucumberTest {
     }
 
     public static class HooksWithOrder {
-        public List<String> invoked = new ArrayList<>();
+        public final List<String> invoked = new ArrayList<>();
 
         @Before(order = 1000)
         public void before1000() {
@@ -107,7 +107,7 @@ public class ComponentLifecycleCucumberTest {
     }
 
     public static class HooksWithOrderAndTags {
-        public List<String> invoked = new ArrayList<>();
+        public final List<String> invoked = new ArrayList<>();
 
         @Before(order = 1000, value = {"@ui"})
         public void before1000() {

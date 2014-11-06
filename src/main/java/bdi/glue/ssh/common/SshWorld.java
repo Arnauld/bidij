@@ -9,7 +9,7 @@ public class SshWorld {
 
     private SshSessionBuilder sessionBuilder;
     private SshGateway sshGateway = new SshGateway();
-    private Stack<SshSession> sessionStack = new Stack<>();
+    private final Stack<SshSession> sessionStack = new Stack<>();
 
     public SshSessionBuilder currentSessionBuilder() {
         if (sessionBuilder == null)

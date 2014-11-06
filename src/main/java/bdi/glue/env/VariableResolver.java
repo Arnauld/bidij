@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
 public class VariableResolver {
-    private Map<String, Supplier<String>> variables = new HashMap<>();
+    private final Map<String, Supplier<String>> variables = new HashMap<>();
     private Pattern variablePattern = Pattern.compile("\\$\\{([^}]+)\\}");
 
     public VariableResolver declareVariable(String name, Supplier<String> valueSupplier) {
@@ -50,7 +50,7 @@ public class VariableResolver {
     public static Map<String, Supplier<String>> convert(Map<String, String> variables) {
         Map<String, Supplier<String>> map = new HashMap<>();
         for (Map.Entry<String, String> entry : variables.entrySet()) {
-            map.put(entry.getKey(), () -> entry.getValue());
+            map.put(entry.getKey(), entry::getValue);
         }
         return map;
     }

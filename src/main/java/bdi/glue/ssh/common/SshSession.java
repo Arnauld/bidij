@@ -23,7 +23,7 @@ public class SshSession {
     private final Session session;
     private final Channel channel;
     private Charset charset = Charset.forName("UTF8");
-    private ByteArrayOutputStream bout = new ByteArrayOutputStream();
+    private final ByteArrayOutputStream bout = new ByteArrayOutputStream();
 
     public SshSession(Session session, String channelType) throws JSchException {
         this.session = session;
@@ -58,5 +58,9 @@ public class SshSession {
         } catch (UnsupportedEncodingException e) {
             throw new SshException(e);
         }
+    }
+
+    public Session getSession() {
+        return session;
     }
 }

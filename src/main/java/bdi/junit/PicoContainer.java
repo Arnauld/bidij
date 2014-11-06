@@ -12,7 +12,7 @@ import java.util.Set;
  */
 public class PicoContainer {
     private MutablePicoContainer pico;
-    private final Set<Class<?>> classes = new HashSet<Class<?>>();
+    private final Set<Class<?>> classes = new HashSet<>();
 
     public MutablePicoContainer underlying() {
         return pico;
@@ -20,9 +20,7 @@ public class PicoContainer {
 
     public void start() {
         pico = new PicoBuilder().withCaching().build();
-        for (Class<?> clazz : classes) {
-            pico.addComponent(clazz);
-        }
+        classes.forEach(pico::addComponent);
         pico.start();
     }
 

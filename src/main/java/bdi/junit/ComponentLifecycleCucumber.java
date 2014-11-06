@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
  */
 public class ComponentLifecycleCucumber extends ComponentLifecycle {
 
-    private List<String> tags = new ArrayList<>();
+    private final List<String> tags = new ArrayList<>();
 
     public ComponentLifecycleCucumber(String... tags) {
         this.tags.addAll(Arrays.asList(tags));
@@ -59,7 +59,7 @@ public class ComponentLifecycleCucumber extends ComponentLifecycle {
     }
 
     private void collectInvocation(List<Invocation> invocationList,
-                                   Class<? extends Object> aClass,
+                                   Class<?> aClass,
                                    Object component,
                                    Class<? extends Annotation> annotationClass,
                                    Function<Annotation, String[]> tagsOf) {

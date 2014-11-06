@@ -8,7 +8,7 @@ import java.util.Map;
  */
 public class GlobalWorld {
 
-    private Map<Object, Object> context = new HashMap<>();
+    private final Map<Object, Object> context = new HashMap<>();
 
     public void put(Object key, Object value) {
         context.put(key, value);

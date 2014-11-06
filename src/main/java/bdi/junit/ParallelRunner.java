@@ -40,7 +40,7 @@ public class ParallelRunner extends BlockJUnit4ClassRunner {
     }
 
     private static class ConcurrentTestRunnerThreadFactory implements ThreadFactory {
-        private AtomicLong count = new AtomicLong();
+        private final AtomicLong count = new AtomicLong();
 
         public Thread newThread(Runnable runnable) {
             return new Thread(runnable, ParallelRunner.class.getSimpleName() + "-Thread-" + count.getAndIncrement());

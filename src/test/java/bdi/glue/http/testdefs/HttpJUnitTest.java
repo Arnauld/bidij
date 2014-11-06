@@ -4,7 +4,6 @@ import bdi.glue.http.common.RawHttpStepdefs;
 import bdi.glue.http.httpclient.HttpClientHooks;
 import bdi.junit.ComponentLifecycleCucumber;
 import bdi.junit.PicoContainerRule;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -14,20 +13,13 @@ import org.junit.Test;
 public class HttpJUnitTest {
 
     @Rule
-    public PicoContainerRule container = new PicoContainerRule(
+    public final PicoContainerRule container = new PicoContainerRule(
             // app
             SampleAppStepdefs.class,
             SampleAppHooks.class,
             // lib
             HttpClientHooks.class,
             RawHttpStepdefs.class).using(new ComponentLifecycleCucumber());
-
-    private RawHttpStepdefs httpSteps;
-    private SampleAppStepdefs appSteps;
-
-    @Before
-    public void setUp() {
-    }
 
     @Test
     public void get_on_https() throws Exception {
@@ -43,8 +35,9 @@ public class HttpJUnitTest {
         */
 
         container.using(new ComponentLifecycleCucumber("@http_secure", "@http_secure__allow_all_hostname"));
-        appSteps = container.get(SampleAppStepdefs.class);
-        httpSteps = container.get(RawHttpStepdefs.class);
+
+        SampleAppStepdefs appSteps = container.get(SampleAppStepdefs.class);
+        RawHttpStepdefs httpSteps = container.get(RawHttpStepdefs.class);
 
         appSteps.startServer(8080, 8083);
         httpSteps.given_a_host_set_to("https://localhost:8083");

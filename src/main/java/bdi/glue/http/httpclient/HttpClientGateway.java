@@ -37,7 +37,7 @@ public class HttpClientGateway implements HttpGateway {
 
     private static final Charset UTF8 = Charset.forName("utf8");
 
-    private Logger log = LoggerFactory.getLogger(HttpClientGateway.class);
+    private final Logger log = LoggerFactory.getLogger(HttpClientGateway.class);
 
     private final HttpClientWorld httpClientWorld;
     private URI hostUri;
@@ -122,10 +122,9 @@ public class HttpClientGateway implements HttpGateway {
         List<org.apache.http.cookie.Cookie> cookies = cookieStore.getCookies();
         cookieStore.clear();
         List<String> cookiesToRemove = req.getCookiesToRemove();
-        for (org.apache.http.cookie.Cookie cookie : cookies) {
-            if (!cookiesToRemove.contains(cookie.getName()))
-                cookieStore.addCookie(cookie);
-        }
+        cookies.stream()
+                .filter(cookie -> !cookiesToRemove.contains(cookie.getName()))
+                .forEach(cookieStore::addCookie);
 
         for (Cookie cookie : req.getCookies()) {
             cookieStore.addCookie(new BasicClientCookie(cookie.name(), cookie.value()));

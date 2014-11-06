@@ -9,13 +9,12 @@ import java.util.List;
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
 public class Rows {
-    private int nbCols;
     private Column[] columns;
-    private List<Object[]> rows = new ArrayList<>();
+    private final List<Object[]> rows = new ArrayList<>();
     private int nbRows;
 
     public void defineColumns(ResultSetMetaData rsmd) throws SQLException {
-        nbCols = rsmd.getColumnCount();
+        int nbCols = rsmd.getColumnCount();
         columns = new Column[nbCols];
         for (int i = 1; i <= nbCols; i++) {
             columns[i - 1] = new Column(
@@ -23,6 +22,10 @@ public class Rows {
                     rsmd.getColumnType(i),
                     rsmd.getColumnName(i));
         }
+    }
+
+    public int getNbCols() {
+        return columns.length;
     }
 
     public int getNbRows() {
@@ -35,6 +38,10 @@ public class Rows {
 
     public void defineNumberOfRows(int nbRows) {
         this.nbRows = nbRows;
+    }
+
+    public List<Object[]> getRows() {
+        return rows;
     }
 
     public static class Column {

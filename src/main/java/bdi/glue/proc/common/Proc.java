@@ -25,7 +25,7 @@ public class Proc {
         return "pid_" + new SimpleDateFormat("yyyyMMdd'_'HHmmss").format(new Date()) + "_" + idGen.incrementAndGet();
     }
 
-    private Logger log = LoggerFactory.getLogger(Proc.class);
+    private final Logger log = LoggerFactory.getLogger(Proc.class);
 
     private final String pid;
     private final String[] cmdarray;

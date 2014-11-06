@@ -17,7 +17,7 @@ import java.io.IOException;
  */
 public class AboutServlet extends HttpServlet {
 
-    private Logger logger = LoggerFactory.getLogger(AboutServlet.class);
+    private final Logger logger = LoggerFactory.getLogger(AboutServlet.class);
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

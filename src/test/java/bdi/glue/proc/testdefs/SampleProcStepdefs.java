@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class SampleProcStepdefs {
 
-    private static AtomicInteger idGen = new AtomicInteger();
+    private static final AtomicInteger idGen = new AtomicInteger();
 
     private final ProcWorld procWorld;
     private final VariableResolver variableResolver;

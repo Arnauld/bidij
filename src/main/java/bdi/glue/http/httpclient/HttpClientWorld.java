@@ -14,8 +14,8 @@ import java.util.List;
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
 public class HttpClientWorld {
-    private List<Function<HttpClientBuilder, HttpClientBuilder>> builderConfigurers = Lists.newArrayList();
-    private List<Function<CloseableHttpClient, CloseableHttpClient>> clientConfigurers = Lists.newArrayList();
+    private final List<Function<HttpClientBuilder, HttpClientBuilder>> builderConfigurers = Lists.newArrayList();
+    private final List<Function<CloseableHttpClient, CloseableHttpClient>> clientConfigurers = Lists.newArrayList();
 
     private BasicCookieStore cookieStore;
     private CloseableHttpClient httpclient;

@@ -10,14 +10,14 @@ public class HttpRequestBuilder {
 
     private String methodAsString;
     private String requestPath;
-    private List<Header> headers = new ArrayList<>();
-    private List<Cookie> cookies = new ArrayList<>();
+    private final List<Header> headers = new ArrayList<>();
+    private final List<Cookie> cookies = new ArrayList<>();
     private String body;
     private String contentType;
     private String username;
     private String password;
-    private List<Parameter> parameters = new ArrayList<>();
-    private List<String> cookiesToRemove = new ArrayList<>();
+    private final List<Parameter> parameters = new ArrayList<>();
+    private final List<String> cookiesToRemove = new ArrayList<>();
 
     public HttpRequestBuilder method(String methodAsString) {
         this.methodAsString = methodAsString;

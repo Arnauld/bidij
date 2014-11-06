@@ -28,8 +28,8 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
  */
 public class UserServlet extends HttpServlet {
 
-    private Logger logger = LoggerFactory.getLogger(UserServlet.class);
-    private UserRepository userRepository = new UserRepository();
+    private final Logger logger = LoggerFactory.getLogger(UserServlet.class);
+    private final UserRepository userRepository = new UserRepository();
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

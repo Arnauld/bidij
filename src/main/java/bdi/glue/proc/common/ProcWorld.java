@@ -11,7 +11,7 @@ import java.util.concurrent.TimeoutException;
  */
 public class ProcWorld {
 
-    private Stack<Proc> processStack = new Stack<>();
+    private final Stack<Proc> processStack = new Stack<>();
     private String currentDir;
     private String outputDir;
     //

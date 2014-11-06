@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SshGateway {
 
-    private Logger log = LoggerFactory.getLogger(SshGateway.class);
+    private final Logger log = LoggerFactory.getLogger(SshGateway.class);
 
     public SshSession openSession(SshSessionBuilder builder) {
         JSch jsch = new JSch();
