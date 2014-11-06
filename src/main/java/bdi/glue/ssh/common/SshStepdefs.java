@@ -4,6 +4,7 @@ import bdi.glue.env.VariableResolver;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+import org.assertj.core.api.Assertions;
 import org.assertj.core.api.StringAssert;
 
 import java.util.List;
@@ -69,7 +70,7 @@ public class SshStepdefs {
     @When("^through ssh, I run `([^`]+)`$")
     public void runSshCommand(String command) throws Throwable {
         SshSession sshSession = sshWorld.peekSession();
-        sshSession.runCommand(command);
+        sshSession.runCommand(variableResolver.resolve(command));
     }
 
     //-------------------------------------------------------------------------
@@ -86,9 +87,16 @@ public class SshStepdefs {
                                         String timeoutUnit,
                                         String comparator,
                                         String expectedText) throws Throwable {
-        TimeUnit unit = TimeUnit.SECONDS;
+        TimeUnit unit;
         if (timeoutUnit.toLowerCase().startsWith("minute"))
             unit = TimeUnit.MINUTES;
+        else if (timeoutUnit.toLowerCase().startsWith("second"))
+            unit = TimeUnit.SECONDS;
+        else {
+            unit = TimeUnit.SECONDS;
+            Assertions.fail("Unrecognized timeunit");
+        }
+
 
         await().atMost(timeout, unit).until(() -> {
                     SshSession sshSession = sshWorld.peekSession();

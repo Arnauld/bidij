@@ -10,7 +10,6 @@ import bdi.glue.jdbc.testdefs.JdbcFeatures;
 import bdi.glue.proc.testdefs.ProcFeatures;
 import bdi.glue.ssh.testdefs.SshFeatures;
 import com.itextpdf.text.DocumentException;
-import gutenberg.itext.ITextContext;
 import gutenberg.itext.SimpleEmitter;
 import gutenberg.itext.model.Markdown;
 import org.junit.AfterClass;
@@ -114,12 +113,7 @@ public class TestSuite {
     }
 
     private static SimpleEmitter grammar(Grammar grammar) {
-        return new SimpleEmitter() {
-            @Override
-            public void emit(ITextContext context) {
-                context.emit(grammar);
-            }
-        };
+        return context -> context.emit(grammar);
     }
 
     private static List<FeatureExec> loadFeatures(File buildDir, String resourcePath) throws IOException {

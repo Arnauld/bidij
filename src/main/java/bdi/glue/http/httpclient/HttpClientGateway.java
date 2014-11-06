@@ -13,6 +13,7 @@ import org.apache.http.client.methods.*;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.ContentType;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCookieStore;
@@ -140,7 +141,14 @@ public class HttpClientGateway implements HttpGateway {
             throw new IllegalArgumentException("Cannot attach body on " + m + " request");
         }
 
-        HttpEntity entity = new ByteArrayEntity(body.getBytes(UTF8));
+        HttpEntity entity;
+        String mimeType = req.getContentType();
+        if (mimeType != null) {
+            ContentType contentType = ContentType.create(mimeType, UTF8);
+            entity = new ByteArrayEntity(body.getBytes(UTF8), contentType);
+        } else {
+            entity = new ByteArrayEntity(body.getBytes(UTF8));
+        }
         ((HttpEntityEnclosingRequestBase) requestBase).setEntity(entity);
     }
 

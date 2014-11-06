@@ -9,6 +9,7 @@ import org.skyscreamer.jsonassert.JSONCompare;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,7 +35,7 @@ public class RawHttpStepdefs {
     //-------------------------------------------------------------------------
 
     @Given("^an host set to \"([^\"]*)\"$")
-    public void defineHost(String uriAsString) throws Throwable {
+    public void given_a_host_set_to(String uriAsString) throws URISyntaxException {
         URI uri = new URI(uriAsString);
         httpWorld
                 .getHttpGateway()
@@ -42,47 +43,47 @@ public class RawHttpStepdefs {
     }
 
     @Given("^the request's header \"([^\"]*)\" has been set to \"([^\"]*)\"$")
-    public void defineRequestHeader(String headerName, String headerValue) {
+    public void given_request_header_set_to(String headerName, String headerValue) {
         httpWorld
                 .currentRequestBuilder()
                 .header(new Header(headerName, headerValue));
     }
 
     @Given("^(?:a|the) \"([^\"]*)\" header set to \"([^\"]*)\"$")
-    public void defineRequestHeaderAlt(String headerName, String headerValue) {
-        defineRequestHeader(headerName, headerValue);
+    public void given_request_header_set_to_(String headerName, String headerValue) {
+        given_request_header_set_to(headerName, headerValue);
     }
 
     @Given("^the following request's header:$")
-    public void defineRequestHeaders(List<Header> headers) {
+    public void given_request_headers_set_to(List<Header> headers) {
         httpWorld
                 .currentRequestBuilder()
                 .headers(headers);
     }
 
     @Given("^the request method has been set to (.*)$")
-    public void defineRequestMethod(String methodAsString) {
+    public void given_request_method_set_to(String methodAsString) {
         httpWorld
                 .currentRequestBuilder()
                 .method(methodAsString);
     }
 
     @Given("^the request has no cookie named (.*)$")
-    public void removeCookieFromHttpRequest(String cookieName) {
+    public void given_no_cookie_named(String cookieName) {
         httpWorld
                 .currentRequestBuilder()
                 .cookieToRemove(cookieName);
     }
 
     @Given("^the request cookie \"([^\"]*)\" has been set to \"([^\"]*)\"$")
-    public void assertRequestCookieShouldBeEqualTo(String cookieName, String cookieValue) {
+    public void given_cookie_set_to(String cookieName, String cookieValue) {
         httpWorld
                 .currentRequestBuilder()
                 .cookie(cookieName, cookieValue);
     }
 
     @Given("^basic auth credentials set to \"([^\"]*)\" and \"([^\"]*)\"$")
-    public void defineBasicAuthCredentials(String username, String password) throws Throwable {
+    public void given_basic_auth_credentials_set_to(String username, String password) throws Throwable {
         httpWorld
                 .currentRequestBuilder()
                 .basicAuthCredentials(username, password);
@@ -100,7 +101,7 @@ public class RawHttpStepdefs {
      * @param contentTypes comma-separated lists of MIME type (e.g. "application/json" or "text/html" ...)
      */
     @Given("^a content format negotiation set to \"([^\"]*)\"$")
-    public void defineAcceptHeader(String contentTypes) throws Throwable {
+    public void given_content_format_negociation_set_to(String contentTypes) throws Throwable {
         httpWorld
                 .currentRequestBuilder()
                 .header(new Header("Accept", contentTypes));
@@ -115,12 +116,12 @@ public class RawHttpStepdefs {
     //-------------------------------------------------------------------------
 
     @When("^a request is made to \"([^\"]+)\"$")
-    public void invokeGET(String url) {
-        invokeUsingMethod("GET", url);
+    public void when_a_GET_request_is_made_to(String url) {
+        when_request_is_made_to("GET", url);
     }
 
     @When("^a ([a-zA-Z]+) request is made to \"([^\"]+)\"$")
-    public void invokeUsingMethod(String methodAsString, String url) {
+    public void when_request_is_made_to(String methodAsString, String url) {
         HttpRequestBuilder req = httpWorld
                 .currentRequestBuilder()
                 .method(methodAsString)
@@ -129,7 +130,7 @@ public class RawHttpStepdefs {
     }
 
     @When("^a ([a-zA-Z]+) request is made to \"([^\"]+)\" with the following parameters:$")
-    public void invokeUsingMethod(String methodAsString, String url, List<Parameter> parameters) {
+    public void when_request_is_made_to_with_parameters(String methodAsString, String url, List<Parameter> parameters) {
         HttpRequestBuilder req = httpWorld
                 .currentRequestBuilder()
                 .method(methodAsString)
@@ -140,7 +141,7 @@ public class RawHttpStepdefs {
 
 
     @When("^a ([a-zA-Z]+) request is made to \"([^\"]+)\" with content type \"([^\"]+)\" with:$")
-    public void invokeUsingMethod(String methodAsString, String url, String contentType, String body) {
+    public void when_request_is_made_to_with_content_type_and_body(String methodAsString, String url, String contentType, String body) {
         HttpRequestBuilder req = httpWorld
                 .currentRequestBuilder()
                 .method(methodAsString)
@@ -151,12 +152,12 @@ public class RawHttpStepdefs {
     }
 
     @When("^a json ([a-zA-Z]+) request is made to \"([^\"]+)\"  with:$")
-    public void invokeJsonUsingMethod(String methodAsString, String url, String body) {
-        invokeUsingMethod(methodAsString, url, "application/json", body);
+    public void when_request_is_made_to_with_json_body(String methodAsString, String url, String body) {
+        when_request_is_made_to_with_content_type_and_body(methodAsString, url, "application/json", body);
     }
 
     @When("^I follow redirect$")
-    public void followRedirect() {
+    public void when_redirect_is_followed() {
         throw new UnsupportedOperationException();
     }
 
@@ -175,13 +176,13 @@ public class RawHttpStepdefs {
     //-------------------------------------------------------------------------
 
     @Then("^the response status code should be (\\d+)$")
-    public void assertResponseCodeIs(int expectedCode) {
+    public void then_response_status_code_should_be(int expectedCode) {
         HttpResponse response = httpWorld.lastResponse();
         assertThat(response.statusCode()).isEqualTo(expectedCode);
     }
 
     @Then("^the response status code should be (\\d+) \\((.+)\\)$")
-    public void assertResponseCodeIs(int expectedCode, String explanation) {
+    public void then_response_status_code_should_be(int expectedCode, String explanation) {
         HttpResponse response = httpWorld.lastResponse();
         assertThat(response.statusCode()).isEqualTo(expectedCode);
 
@@ -190,14 +191,14 @@ public class RawHttpStepdefs {
     }
 
     @Then("^the response should have the cookie (.*)$")
-    public void assertResponseCookieIsPresent(String cookieName) {
+    public void then_response_should_have_the_cookie_named(String cookieName) {
         HttpResponse response = httpWorld.lastResponse();
         List<Cookie> cookies = response.getCookies(cookieName);
         assertThat(cookies).isNotEmpty();
     }
 
     @Then("^the response's cookie \"([^\"]*)\" should be set to \"([^\"]*)\"$")
-    public void assertResponseCookieShouldBeEqualTo(String cookieName, String expectedValue) {
+    public void then_response_should_have_the_cookie_set_to(String cookieName, String expectedValue) {
         HttpResponse response = httpWorld.lastResponse();
         List<Cookie> cookies = response.getCookies(cookieName);
         assertThat(cookies).isNotEmpty();
@@ -208,7 +209,7 @@ public class RawHttpStepdefs {
     }
 
     @Then("^the response's body should (start with|end with|match|contain|be) \"(.*)\"$")
-    public void assertResponseBodySatisfies(String comparator, String expectedText) {
+    public void then_response_body_should_satisfy(String comparator, String expectedText) {
         HttpResponse response = httpWorld.lastResponse();
         StringAssert stringAssert = assertThat(response.bodyAsText());
         switch (comparator) {
@@ -233,12 +234,12 @@ public class RawHttpStepdefs {
     }
 
     @Then("^the response's body should (match|contain|be):$")
-    public void assertResponseBodySatisfiesPyString(String comparator, String expectedText) {
-        assertResponseBodySatisfies(comparator, expectedText);
+    public void then_response_body_should_satisfy_(String comparator, String expectedText) {
+        then_response_body_should_satisfy(comparator, expectedText);
     }
 
     @Then("^the response's body should not (match|contain|be) \"([^\"]*)\"$")
-    public void assertResponseBodyDoNotSatisfy(String comparator, String expectedText) {
+    public void then_response_body_should_not_satisfy(String comparator, String expectedText) {
         HttpResponse response = httpWorld.lastResponse();
         StringAssert stringAssert = assertThat(response.bodyAsText());
         switch (comparator) {
@@ -257,7 +258,7 @@ public class RawHttpStepdefs {
     }
 
     @Then("^the json response's body should (contain|be):$")
-    public void assertResponseJsonBodySatisfies(String comparator, String expectedText) throws JSONException {
+    public void then_response_json_body_should_satisfy(String comparator, String expectedText) throws JSONException {
         HttpResponse response = httpWorld.lastResponse();
         String actual = response.bodyAsText();
 
@@ -269,22 +270,22 @@ public class RawHttpStepdefs {
     }
 
     @Then("^the response's header \"([^\"]*)\" should be set to \"([^\"]*)\"$")
-    public void assertResponseHeaderValueIsEqualTo(String headerName, String headerValue) {
+    public void then_response_header_should_be_set_to(String headerName, String headerValue) {
         throw new UnsupportedOperationException();
     }
 
     @Then("^the response's header \"([^\"]*)\" should not be set to \"([^\"]*)\"$")
-    public void assertResponseHeaderValueIsNotEqualTo(String headerName, String headerValue) {
+    public void then_response_header_should_not_be_set_to(String headerName, String headerValue) {
         throw new UnsupportedOperationException();
     }
 
     @Then("^the response should indicate a redirect$")
-    public void assertResponseHasBeenRedirected() {
+    public void then_response_should_indicate_a_redirect() {
         throw new UnsupportedOperationException();
     }
 
     @Then("^the response should not indicate a redirect$")
-    public void assertResponseHasNotBeenRedirected() {
+    public void then_response_should_not_indicate_a_redirect() {
         throw new UnsupportedOperationException();
     }
 
