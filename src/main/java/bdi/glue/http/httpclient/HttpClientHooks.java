@@ -8,12 +8,12 @@ import cucumber.api.java.Before;
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
-public class Hook {
+public class HttpClientHooks {
 
     private final HttpClientWorld httpClientWorld;
     private final HttpWorld bdiWorld;
 
-    public Hook(HttpClientWorld httpClientWorld, HttpWorld bdiWorld) {
+    public HttpClientHooks(HttpClientWorld httpClientWorld, HttpWorld bdiWorld) {
         this.httpClientWorld = httpClientWorld;
         this.bdiWorld = bdiWorld;
     }
